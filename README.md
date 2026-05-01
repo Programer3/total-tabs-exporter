@@ -82,7 +82,7 @@ This extension is designed with security and privacy as top priorities:
 
 ##  Architecture Overview
 
-The extension follows modern web extension best practices:
+The codebase follows production-grade conventions, modern web extension best practices & SOLID principles:
 
 - **Manifest V3**: Latest Firefox extension standard
 - **Modular Design**: Separate concerns for maintainability
@@ -101,7 +101,7 @@ The extension includes comprehensive test coverage to ensure reliability:
 - **Performance Tests**: 1000+ tab handling verification
 - **Security Tests**: XSS prevention and URL sanitization
 
-All tests pass before each release to guarantee stability.
+All tests pass before each release to guarantee stability*.
 
 ---
 
@@ -148,12 +148,12 @@ We welcome contributions! Here's how you can help:
 - **Bug Reports**: Found an issue? Open a GitHub issue.
 <!-- - **Feature Requests**: Have an idea? [Start a discussion](https://github.com/programer3/total-tabs-exporter/discussions) -->
 - **Code Contributions**: Open a Pull request to contribute your code
-- **Documentation**: Improve this README or add tutorials
+- **Documentation**: Improve this README or something
 
 ### [Development Setup](Development.md)
 
 ### Code of Conduct
-Please be respectful and constructive in all interactions. We follow a standard code of conduct to maintain a positive community.
+Please be respectful and constructive in all interactions. Its a personal side project
 
 ---
 
