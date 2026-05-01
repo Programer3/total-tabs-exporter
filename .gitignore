@@ -44,3 +44,6 @@ logs/
 *.tmp
 *.temp
 .cache/
+
+#perosnal files
+dev.md
