@@ -1,0 +1,60 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Exporter",
+  "short_name": "TabExporter",
+  "version": "1.0.0",
+  "description": "Export Firefox tabs to Markdown, JSON, HTML, or plain text. Supports native tab groups, containers, and 1000+ tabs.",
+  "default_locale": "en_US",
+
+  "permissions": [
+    "tabs",
+    "tabGroups",
+    "contextualIdentities",
+    "downloads",
+    "clipboardWrite",
+    "storage"
+  ],
+
+  "background": {
+    "scripts": ["background/service-worker.js"]
+  },
+
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Tab Exporter",
+    "default_icon": {
+      "48": "icons/icon-48.png",
+      "96": "icons/icon-96.png"
+    }
+  },
+
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
+
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
+  },
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "tab-exporter@local.extension",
+      "strict_min_version": "131.0"
+    }
+  },
+
+  "content_security_policy": {
+    "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:;"
+  },
+
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+E"
+      },
+      "description": "Open Tab Exporter"
+    }
+  }
+}

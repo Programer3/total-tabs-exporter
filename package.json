@@ -1,0 +1,35 @@
+{
+  "name": "tab-exporter",
+  "version": "1.0.0",
+  "description": "Firefox extension to export tabs in multiple formats",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --coverage",
+    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch",
+    "test:unit": "node --experimental-vm-modules node_modules/.bin/jest tests/unit",
+    "test:integration": "node --experimental-vm-modules node_modules/.bin/jest tests/integration",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "package": "web-ext build --source-dir . --artifacts-dir dist --overwrite-dest",
+    "sign": "web-ext sign --source-dir . --artifacts-dir dist",
+    "dev": "web-ext run --source-dir ."
+  },
+  "devDependencies": {
+    "eslint": "^8.0.0",
+    "jest": "^29.0.0",
+    "web-ext": "^8.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFiles": ["./tests/mocks/browser.mock.js"],
+    "testMatch": ["**/tests/**/*.test.js"],
+    "collectCoverageFrom": [
+      "core/**/*.js",
+      "formatters/**/*.js",
+      "utils/**/*.js"
+    ],
+    "extensionsToTreatAsEsm": [".js"],
+    "transform": {}
+  }
+}
