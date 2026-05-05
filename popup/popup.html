@@ -1,31 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tab Exporter</title>
+  <title>Total Tab Exporter</title>
   <link rel="stylesheet" href="popup.css">
 </head>
+
 <body>
   <header class="header">
     <div class="logo-row">
       <span class="logo-icon">⬡</span>
-      <span class="logo-text">Tab Exporter</span>
+      <span class="logo-text">Total Tab Exporter</span>
     </div>
-    <button id="settings-btn" class="icon-btn"
-            aria-label="Open settings"
-            data-tip="Open persistent settings (default format, filters, etc.)">
+    <button id="settings-btn" class="icon-btn" aria-label="Open settings"
+      data-tip="Open persistent settings (default format, filters, etc.)">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="12" cy="12" r="3"/>
-        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        <circle cx="12" cy="12" r="3" />
+        <path
+          d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
       </svg>
     </button>
   </header>
 
   <!-- Tab count summary -->
   <div id="tab-summary" class="tab-summary"
-       data-tip="Number of tabs that will be included in the export (updates with your filter settings)"
-       aria-live="polite">
+    data-tip="Number of tabs that will be included in the export (updates with your filter settings)"
+    aria-live="polite">
     <span class="summary-count" id="tab-count">—</span>
     <span class="summary-label">tabs ready to export</span>
   </div>
@@ -38,28 +40,28 @@
     <div class="format-grid" role="radiogroup" aria-label="Export format">
 
       <label class="format-card" for="fmt-markdown"
-             data-tip="Markdown — great for note-taking apps like Obsidian, Notion, or any text editor. Exports as clickable [Title](URL) links.">
+        data-tip="Markdown — great for note-taking apps like Obsidian, Notion, or any text editor. Exports as clickable [Title](URL) links.">
         <input type="radio" id="fmt-markdown" name="format" value="markdown" checked>
         <span class="fmt-icon">MD</span>
         <span class="fmt-name">Markdown</span>
       </label>
 
       <label class="format-card" for="fmt-json"
-             data-tip="JSON — structured data format. Includes full tab metadata (window, container, favicon, pinned state). Great for developers or importing into other tools.">
+        data-tip="JSON — structured data format. Includes full tab metadata (window, container, favicon, pinned state). Great for developers or importing into other tools.">
         <input type="radio" id="fmt-json" name="format" value="json">
         <span class="fmt-icon">{}</span>
         <span class="fmt-name">JSON</span>
       </label>
 
       <label class="format-card" for="fmt-html"
-             data-tip="HTML — self-contained webpage with clickable links, favicons, and section headings per group/container. Open directly in any browser.">
+        data-tip="HTML — self-contained webpage with clickable links, favicons, and section headings per group/container. Open directly in any browser.">
         <input type="radio" id="fmt-html" name="format" value="html">
         <span class="fmt-icon">&lt;/&gt;</span>
         <span class="fmt-name">HTML</span>
       </label>
 
       <label class="format-card" for="fmt-text"
-             data-tip="Plain Text — simple list of tab titles and URLs. Works everywhere: email, Notepad, terminal, or any plain text tool.">
+        data-tip="Plain Text — simple list of tab titles and URLs. Works everywhere: email, Notepad, terminal, or any plain text tool.">
         <input type="radio" id="fmt-text" name="format" value="text">
         <span class="fmt-icon">TXT</span>
         <span class="fmt-name">Text</span>
@@ -71,7 +73,8 @@
   <!-- Scope selection -->
   <section class="section" aria-label="Export Scope">
     <div class="section-label">Scope
-      <span class="help-badge" data-tip="Choose which tabs to export: all open tabs, a specific tab group (colour-coded groups in your tab bar), a Firefox Container, or only the ungrouped tabs.">?</span>
+      <span class="help-badge"
+        data-tip="Choose which tabs to export: all open tabs, a specific tab group (colour-coded groups in your tab bar), a Firefox Container, or only the ungrouped tabs.">?</span>
     </div>
     <div class="scope-row">
       <select id="scope-select" class="select" aria-label="Export scope">
@@ -79,12 +82,12 @@
         <option value="ungrouped">🔗 Default / Ungrouped</option>
         <!-- Groups and containers are injected dynamically by popup.js -->
       </select>
-      <button id="refresh-scope" class="icon-btn"
-              aria-label="Refresh groups and containers list"
-              data-tip="Refresh — re-scans your open tabs for new groups or containers">
+      <button id="refresh-scope" class="icon-btn" aria-label="Refresh groups and containers list"
+        data-tip="Refresh — re-scans your open tabs for new groups or containers">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
-          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          <polyline points="23 4 23 10 17 10" />
+          <polyline points="1 20 1 14 7 14" />
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
         </svg>
       </button>
     </div>
@@ -97,7 +100,8 @@
 
       <label class="toggle-label-row" for="opt-title">
         <span class="opt-text">Include tab title
-          <span class="help-badge" data-tip="ON: exports both the page title and URL (e.g. 'Google – https://google.com'). OFF: exports URLs only — useful for privacy or cleaner lists.">?</span>
+          <span class="help-badge"
+            data-tip="ON: exports both the page title and URL (e.g. 'Google – https://google.com'). OFF: exports URLs only — useful for privacy or cleaner lists.">?</span>
         </span>
         <label class="toggle" for="opt-title">
           <input type="checkbox" id="opt-title" checked>
@@ -107,7 +111,8 @@
 
       <label class="toggle-label-row" for="opt-filter">
         <span class="opt-text">Filter internal pages
-          <span class="help-badge" data-tip="ON: skips browser internal pages like 'New Tab', 'about:settings', and extension pages. OFF: includes everything. The tab count above updates live.">?</span>
+          <span class="help-badge"
+            data-tip="ON: skips browser internal pages like 'New Tab', 'about:settings', and extension pages. OFF: includes everything. The tab count above updates live.">?</span>
         </span>
         <label class="toggle" for="opt-filter">
           <input type="checkbox" id="opt-filter" checked>
@@ -122,21 +127,20 @@
 
   <!-- Export actions -->
   <div class="action-row">
-    <button id="btn-download" class="btn btn-primary"
-            aria-label="Download export file"
-            data-tip="Save tabs as a file in the chosen format. File is named automatically with today's date and time.">
+    <button id="btn-download" class="btn btn-primary" aria-label="Download export file"
+      data-tip="Save tabs as a file in the chosen format. File is named automatically with today's date and time.">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-        <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
       </svg>
       Download
     </button>
-    <button id="btn-copy" class="btn btn-secondary"
-            aria-label="Copy to clipboard"
-            data-tip="Copy the export text directly to your clipboard — no file saved. Paste anywhere you like.">
+    <button id="btn-copy" class="btn btn-secondary" aria-label="Copy to clipboard"
+      data-tip="Copy the export text directly to your clipboard — no file saved. Paste anywhere you like.">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
       </svg>
       Copy
     </button>
@@ -155,4 +159,5 @@
 
   <script type="module" src="popup.js"></script>
 </body>
+
 </html>

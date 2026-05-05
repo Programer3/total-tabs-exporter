@@ -1,6 +1,6 @@
 {
   "extensionName": {
-    "message": "Tab Exporter",
+    "message": "Total Tab Exporter",
     "description": "Name of the extension"
   },
   "extensionDescription": {
@@ -8,19 +8,43 @@
     "description": "Description shown in the add-ons manager"
   },
   "popupTitle": {
-    "message": "Tab Exporter",
+    "message": "Total Tab Exporter",
     "description": "Title shown in the popup header"
   },
-  "formatMarkdown": { "message": "Markdown" },
-  "formatJson":     { "message": "JSON" },
-  "formatHtml":     { "message": "HTML" },
-  "formatText":     { "message": "Plain Text" },
-  "btnDownload":    { "message": "Download" },
-  "btnCopy":        { "message": "Copy" },
-  "btnSave":        { "message": "Save Settings" },
-  "btnReset":       { "message": "Reset to Defaults" },
-  "scopeAll":       { "message": "All Tabs" },
-  "scopeUngrouped": { "message": "Default / Ungrouped" },
-  "optIncludeTitle":   { "message": "Include tab title" },
-  "optFilterInternal": { "message": "Filter internal pages" }
+  "formatMarkdown": {
+    "message": "Markdown"
+  },
+  "formatJson": {
+    "message": "JSON"
+  },
+  "formatHtml": {
+    "message": "HTML"
+  },
+  "formatText": {
+    "message": "Plain Text"
+  },
+  "btnDownload": {
+    "message": "Download"
+  },
+  "btnCopy": {
+    "message": "Copy"
+  },
+  "btnSave": {
+    "message": "Save Settings"
+  },
+  "btnReset": {
+    "message": "Reset to Defaults"
+  },
+  "scopeAll": {
+    "message": "All Tabs"
+  },
+  "scopeUngrouped": {
+    "message": "Default / Ungrouped"
+  },
+  "optIncludeTitle": {
+    "message": "Include tab title"
+  },
+  "optFilterInternal": {
+    "message": "Filter internal pages"
+  }
 }

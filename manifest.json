@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Total Tabs Exporter",
   "short_name": "totaltabsexporter",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Export Firefox tabs to Markdown, JSON, HTML, or plain text. Supports native tab groups, containers, and 1000+ tabs.",
   "default_locale": "en_US",
   "permissions": [
@@ -37,7 +37,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "tab-exporter@local.extension",
-      "strict_min_version": "131.0",
+      "strict_min_version": "140.0",
       "data_collection_permissions": {
         "required": [
           "browsingActivity",
@@ -55,7 +55,7 @@
       "suggested_key": {
         "default": "Ctrl+Shift+E"
       },
-      "description": "Open Tab Exporter"
+      "description": "Open Total Tab Exporter"
     }
   }
 }

@@ -42,7 +42,7 @@ Made this because I couldn't find any on firefox that can export "groups".
 ##  Usage Tutorial
 
 ### Basic Export
-1. Click the **⬡ Tab Exporter** icon in your Firefox toolbar
+1. Click the **⬡ Total Tab Exporter** icon in your Firefox toolbar
 2. Choose your preferred **Format** (MD / JSON / HTML / TXT)
 3. Select the **Scope** of tabs to export:
    - **All Tabs**: Every open tab across all windows
