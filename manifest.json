@@ -1,11 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "Tab Exporter",
-  "short_name": "TabExporter",
-  "version": "1.0.0",
+  "name": "Total Tabs Exporter",
+  "short_name": "totaltabsexporter",
+  "version": "1.0.1",
   "description": "Export Firefox tabs to Markdown, JSON, HTML, or plain text. Supports native tab groups, containers, and 1000+ tabs.",
   "default_locale": "en_US",
-
   "permissions": [
     "tabs",
     "tabGroups",
@@ -14,41 +13,43 @@
     "clipboardWrite",
     "storage"
   ],
-
   "background": {
-    "scripts": ["background/service-worker.js"]
+    "scripts": [
+      "background/service-worker.js"
+    ]
   },
-
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "Tab Exporter",
+    "default_title": "Total Tabs Exporter",
     "default_icon": {
       "48": "icons/icon-48.png",
       "96": "icons/icon-96.png"
     }
   },
-
   "options_ui": {
     "page": "options/options.html",
     "open_in_tab": true
   },
-
   "icons": {
     "48": "icons/icon-48.png",
     "96": "icons/icon-96.png"
   },
-
   "browser_specific_settings": {
     "gecko": {
       "id": "tab-exporter@local.extension",
-      "strict_min_version": "131.0"
+      "strict_min_version": "131.0",
+      "data_collection_permissions": {
+        "required": [
+          "browsingActivity",
+          "websiteActivity",
+          "websiteContent"
+        ]
+      }
     }
   },
-
   "content_security_policy": {
     "extension_pages": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:;"
   },
-
   "commands": {
     "_execute_action": {
       "suggested_key": {

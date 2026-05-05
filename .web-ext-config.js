@@ -13,6 +13,9 @@ export default {
     "package.json",
     "package-lock.json",
     "README.md",
+    "dev.md",
     "jest.config.js",
+    ".gitignore",
+    ".gitattributes"
   ],
 };
