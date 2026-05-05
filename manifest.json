@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Total Tabs Exporter",
+  "name": "__MSG_extensionName__",
   "short_name": "totaltabsexporter",
   "version": "1.0.2",
-  "description": "Export Firefox tabs to Markdown, JSON, HTML, or plain text. Supports native tab groups, containers, and 1000+ tabs.",
+  "description": "__MSG_extensionDescription__",
   "default_locale": "en_US",
   "permissions": [
     "tabs",
@@ -20,7 +20,7 @@
   },
   "action": {
     "default_popup": "popup/popup.html",
-    "default_title": "Total Tabs Exporter",
+    "default_title": "__MSG_extensionName__",
     "default_icon": {
       "48": "icons/icon-48.png",
       "96": "icons/icon-96.png"
@@ -55,7 +55,8 @@
       "suggested_key": {
         "default": "Ctrl+Shift+E"
       },
-      "description": "Open Total Tab Exporter"
+      "description": "__MSG_extensionName__"
     }
   }
+
 }

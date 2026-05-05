@@ -47,7 +47,7 @@ export function sanitizeUrl(url) {
   try {
     const parsed = new URL(url);
     const ALLOWED_PROTOCOLS = new Set([
-      'http:', 'https:', 'ftp:', 'file:', 'moz-extension:',
+      'http:', 'https:', 'ftp:', 'file:', 'moz-extension:', 'about:',
     ]);
     if (!ALLOWED_PROTOCOLS.has(parsed.protocol)) {
       return '#blocked';

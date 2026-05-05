@@ -21,6 +21,14 @@ const DEFAULTS = {
 
 const STORAGE_KEY = 'tabExporterSettings';
 
+function localizeUI() {
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    const key = el.getAttribute('data-i18n');
+    const msg = browser.i18n.getMessage(key);
+    if (msg) { el.textContent = msg; }
+  });
+}
+
 /**
  * Loads settings from storage, merging with defaults for any missing keys.
  * @returns {Promise<AppSettings>}
@@ -76,13 +84,14 @@ function showStatus(msg, isError = false) {
 
 /* ── Init ── */
 async function init() {
+  localizeUI();
   const settings = await loadSettings();
   applyToForm(settings);
 
   elSaveBtn.addEventListener('click', async () => {
     try {
       await saveSettings(readFromForm());
-      showStatus('✓ Settings saved');
+      showStatus(browser.i18n.getMessage('statusSaved') || '✓ Settings saved');
     } catch (err) {
       showStatus(`Error: ${err.message}`, true);
     }
@@ -92,7 +101,7 @@ async function init() {
     try {
       await saveSettings(DEFAULTS);
       applyToForm(DEFAULTS);
-      showStatus('✓ Settings reset to defaults');
+      showStatus(browser.i18n.getMessage('statusReset') || '✓ Settings reset to defaults');
     } catch (err) {
       showStatus(`Error: ${err.message}`, true);
     }

@@ -10,15 +10,15 @@
 
 <body>
   <header class="page-header">
-    <div class="logo">⬡ Total Tab Exporter</div>
-    <p class="subtitle">Preferences persist across all sessions and browser restarts.</p>
+    <div class="logo">⬡ <span data-i18n="extensionName">Total Tab Exporter</span></div>
+    <p class="subtitle" data-i18n="optionsSubtitle">Preferences persist across all sessions and browser restarts.</p>
   </header>
 
   <main class="card">
-    <h2 class="section-title">Export Defaults</h2>
+    <h2 class="section-title" data-i18n="sectionExportDefaults">Export Defaults</h2>
 
     <div class="field-group">
-      <label for="default-format" class="field-label">Default Format</label>
+      <label for="default-format" class="field-label" data-i18n="labelDefaultFormat">Default Format</label>
       <select id="default-format" class="select">
         <option value="markdown">Markdown (.md)</option>
         <option value="json">JSON (.json)</option>
@@ -28,20 +28,20 @@
     </div>
 
     <div class="field-group">
-      <label for="default-output" class="field-label">Default Output</label>
+      <label for="default-output" class="field-label" data-i18n="labelDefaultOutput">Default Output</label>
       <select id="default-output" class="select">
-        <option value="download">Download File</option>
-        <option value="clipboard">Copy to Clipboard</option>
+        <option value="download" data-i18n="outputDownload">Download File</option>
+        <option value="clipboard" data-i18n="outputClipboard">Copy to Clipboard</option>
       </select>
     </div>
 
     <hr class="divider">
-    <h2 class="section-title">Content Options</h2>
+    <h2 class="section-title" data-i18n="sectionContentOptions">Content Options</h2>
 
     <div class="toggle-row">
       <div>
-        <div class="toggle-label">Include Tab Title</div>
-        <div class="toggle-desc">Include the tab title in exported output</div>
+        <div class="toggle-label" data-i18n="optIncludeTitle">Include Tab Title</div>
+        <div class="toggle-desc" data-i18n="descIncludeTitle">Include the tab title in exported output</div>
       </div>
       <label class="toggle" for="include-title">
         <input type="checkbox" id="include-title">
@@ -51,8 +51,8 @@
 
     <div class="toggle-row">
       <div>
-        <div class="toggle-label">Filter Internal Pages</div>
-        <div class="toggle-desc">Exclude about:, moz-extension:, and other internal URLs</div>
+        <div class="toggle-label" data-i18n="optFilterInternal">Filter Internal Pages</div>
+        <div class="toggle-desc" data-i18n="descFilterInternal">Exclude about:, moz-extension:, and other internal URLs</div>
       </div>
       <label class="toggle" for="filter-internal">
         <input type="checkbox" id="filter-internal">
@@ -63,8 +63,8 @@
     <hr class="divider">
 
     <div class="btn-row">
-      <button id="reset-btn" class="btn btn-ghost">↺ Reset to Defaults</button>
-      <button id="save-btn" class="btn btn-primary">Save Settings</button>
+      <button id="reset-btn" class="btn btn-ghost">↺ <span data-i18n="btnReset">Reset to Defaults</span></button>
+      <button id="save-btn" class="btn btn-primary" data-i18n="btnSave">Save Settings</button>
     </div>
 
     <p id="status-msg" hidden class="status-msg"></p>

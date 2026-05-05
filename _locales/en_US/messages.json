@@ -46,5 +46,147 @@
   },
   "optFilterInternal": {
     "message": "Filter internal pages"
+  },
+  "labelFormat": {
+    "message": "Format"
+  },
+  "labelScope": {
+    "message": "Scope"
+  },
+  "labelOptions": {
+    "message": "Options"
+  },
+  "labelTabsReady": {
+    "message": "tabs ready to export"
+  },
+  "ariaSettings": {
+    "message": "Open settings"
+  },
+  "ariaRefresh": {
+    "message": "Refresh groups and containers list"
+  },
+  "ariaDownload": {
+    "message": "Download export file"
+  },
+  "ariaCopy": {
+    "message": "Copy to clipboard"
+  },
+  "tipSettings": {
+    "message": "Open persistent settings (default format, filters, etc.)"
+  },
+  "tipTabSummary": {
+    "message": "Number of tabs that will be included in the export (updates with your filter settings)"
+  },
+  "tipFormatMarkdown": {
+    "message": "Markdown — great for note-taking apps like Obsidian, Notion, or any text editor. Exports as clickable [Title](URL) links."
+  },
+  "tipFormatJson": {
+    "message": "JSON — structured data format. Includes full tab metadata (window, container, favicon, pinned state). Great for developers or importing into other tools."
+  },
+  "tipFormatHtml": {
+    "message": "HTML — self-contained webpage with clickable links, favicons, and section headings per group/container. Open directly in any browser."
+  },
+  "tipFormatText": {
+    "message": "Plain Text — simple list of tab titles and URLs. Works everywhere: email, Notepad, terminal, or any plain text tool."
+  },
+  "tipScope": {
+    "message": "Choose which tabs to export: all open tabs, a specific tab group (colour-coded groups in your tab bar), a Firefox Container, or only the ungrouped tabs."
+  },
+  "tipRefresh": {
+    "message": "Refresh — re-scans your open tabs for new groups or containers"
+  },
+  "tipOptTitle": {
+    "message": "ON: exports both the page title and URL (e.g. 'Google – https://google.com'). OFF: exports URLs only — useful for privacy or cleaner lists."
+  },
+  "tipOptFilter": {
+    "message": "ON: skips browser internal pages like 'New Tab', 'about:settings', and extension pages. OFF: includes everything. The tab count above updates live."
+  },
+  "tipDownload": {
+    "message": "Save tabs as a file in the chosen format. File is named automatically with today's date and time."
+  },
+  "tipCopy": {
+    "message": "Copy the export text directly to your clipboard — no file saved. Paste anywhere you like."
+  },
+  "statusPreparing": {
+    "message": "Preparing…"
+  },
+  "toastCopySuccess": {
+    "message": "✓ $COUNT$ tabs copied to clipboard",
+    "placeholders": {
+      "COUNT": { "content": "$1" }
+    }
+  },
+  "toastDownloadSuccess": {
+    "message": "✓ $COUNT$ tabs saved as $FILE$",
+    "placeholders": {
+      "COUNT": { "content": "$1" },
+      "FILE": { "content": "$2" }
+    }
+  },
+  "toastExportError": {
+    "message": "✗ Export failed: $ERR$",
+    "placeholders": {
+      "ERR": { "content": "$1" }
+    }
+  },
+  "toastScopeError": {
+    "message": "⚠ Could not load scope: $ERR$",
+    "placeholders": {
+      "ERR": { "content": "$1" }
+    }
+  },
+  "optionsTitle": {
+    "message": "Total Tab Exporter — Settings"
+  },
+  "optionsSubtitle": {
+    "message": "Preferences persist across all sessions and browser restarts."
+  },
+  "sectionExportDefaults": {
+    "message": "Export Defaults"
+  },
+  "labelDefaultFormat": {
+    "message": "Default Format"
+  },
+  "labelDefaultOutput": {
+    "message": "Default Output"
+  },
+  "outputDownload": {
+    "message": "Download File"
+  },
+  "outputClipboard": {
+    "message": "Copy to Clipboard"
+  },
+  "sectionContentOptions": {
+    "message": "Content Options"
+  },
+  "descIncludeTitle": {
+    "message": "Include the tab title in exported output"
+  },
+  "descFilterInternal": {
+    "message": "Exclude about:, moz-extension:, and other internal URLs"
+  },
+  "statusSaved": {
+    "message": "Settings saved successfully!"
+  },
+  "statusReset": {
+    "message": "Settings reset to defaults."
+  },
+  "errGroupNotFound": {
+    "message": "Tab group \"$ID$\" not found.",
+    "placeholders": {
+      "ID": { "content": "$1" }
+    }
+  },
+  "errContainerNotFound": {
+    "message": "Container \"$ID$\" not found.",
+    "placeholders": {
+      "ID": { "content": "$1" }
+    }
+  },
+  "errUnknownScope": {
+    "message": "Unknown export scope: \"$SCOPE$\"",
+    "placeholders": {
+      "SCOPE": { "content": "$1" }
+    }
   }
 }

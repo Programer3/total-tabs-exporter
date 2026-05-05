@@ -68,18 +68,22 @@ function applyScope(groupedTabs, scope) {
   if (scope.startsWith('group:')) {
     const id    = scope.slice(6);
     const entry = groupedTabs.groups[id];
-    if (!entry) { throw new Error(`Tab group "${id}" not found.`); }
+    if (!entry) {
+      throw new Error(browser.i18n.getMessage('errGroupNotFound', [id]) || `Tab group "${id}" not found.`);
+    }
     return { all: entry.tabs, groups: { [id]: entry }, containers: {}, ungrouped: [] };
   }
 
   if (scope.startsWith('container:')) {
     const id    = scope.slice(10);
     const entry = groupedTabs.containers[id];
-    if (!entry) { throw new Error(`Container "${id}" not found.`); }
+    if (!entry) {
+      throw new Error(browser.i18n.getMessage('errContainerNotFound', [id]) || `Container "${id}" not found.`);
+    }
     return { all: entry.tabs, groups: {}, containers: { [id]: entry }, ungrouped: [] };
   }
 
-  throw new Error(`Unknown export scope: "${scope}"`);
+  throw new Error(browser.i18n.getMessage('errUnknownScope', [scope]) || `Unknown export scope: "${scope}"`);
 }
 
 /**

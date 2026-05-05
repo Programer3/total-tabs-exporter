@@ -57,8 +57,17 @@ export async function collectTabs({ filterInternal = true } = {}) {
 
   if (filterInternal) {
     const before = tabs.length;
-    tabs = tabs.filter((tab) => !INTERNAL_URL_RE.test(tab.url));
-    logger.debug(`collectTabs: filtered ${before - tabs.length} internal tabs`);
+    tabs = tabs.filter((tab) => {
+      const url = tab.url.toLowerCase();
+      // Filter out common browser internal schemes
+      return !url.startsWith('about:') && 
+             !url.startsWith('moz-extension:') && 
+             !url.startsWith('chrome-extension:') && 
+             !url.startsWith('chrome:');
+    });
+    logger.debug(`collectTabs: filterInternal=true. Before: ${before}, After: ${tabs.length}`);
+  } else {
+    logger.debug(`collectTabs: filterInternal=false. Total: ${tabs.length}`);
   }
 
   return tabs;

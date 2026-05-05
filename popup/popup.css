@@ -403,135 +403,62 @@ body {
   }
 }
 
-/* ── Tooltips (CSS-only, data-tip attribute) ── */
-[data-tip] {
-  position: relative;
-}
-
-[data-tip]::before,
-[data-tip]::after {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.18s ease, transform 0.18s ease;
-  z-index: 200;
-}
-
-/* Bubble */
-[data-tip]::after {
-  content: attr(data-tip);
-  bottom: calc(100% + 8px);
+/* ── Tooltips (Dynamic JS-managed) ── */
+.dynamic-tooltip {
+  position: fixed;
   background: #1c2128;
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 7px;
-  padding: 0.4rem 0.6rem;
-  font-size: 0.72rem;
+  padding: 0.45rem 0.7rem;
+  font-size: 0.75rem;
   font-weight: 400;
-  line-height: 1.45;
+  line-height: 1.4;
   white-space: normal;
   width: max-content;
-  max-width: 220px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55);
+  max-width: 240px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.65);
   text-align: left;
-  transform: translateX(-50%) translateY(4px);
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-/* Arrow */
-[data-tip]::before {
-  content: '';
-  bottom: calc(100% + 2px);
-  border: 5px solid transparent;
-  border-top-color: var(--border);
-  transform: translateX(-50%) translateY(4px);
-}
-
-[data-tip]:hover::after,
-[data-tip]:hover::before,
-[data-tip]:focus-visible::after,
-[data-tip]:focus-visible::before {
+.dynamic-tooltip.visible {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-/* Keep tooltip inside popup — elements near left/right edges shift bubble */
-.format-card:first-child[data-tip]::after {
-  left: 0;
-  transform: none;
-}
-
-.format-card:last-child[data-tip]::after {
-  left: auto;
-  right: 0;
-  transform: none;
-}
-
-.format-card:first-child[data-tip]::before {
-  left: 12px;
-  transform: none;
-}
-
-.format-card:last-child[data-tip]::before {
-  left: auto;
-  right: 12px;
-  transform: none;
-}
-
-/* Right edge elements (extend leftwards) */
-#btn-copy[data-tip]::after,
-#settings-btn[data-tip]::after {
-  left: auto;
-  right: -5px;
-  transform: translateY(4px);
-}
-
-#btn-copy[data-tip]::before,
-#settings-btn[data-tip]::before {
-  left: auto;
-  right: 2px;
-  transform: translateY(4px);
-}
-
-#btn-copy[data-tip]:hover::after,
-#btn-copy[data-tip]:focus-visible::after,
-#settings-btn[data-tip]:hover::after,
-#settings-btn[data-tip]:focus-visible::after {
   transform: translateY(0);
 }
 
-#btn-copy[data-tip]:hover::before,
-#btn-copy[data-tip]:focus-visible::before,
-#settings-btn[data-tip]:hover::before,
-#settings-btn[data-tip]:focus-visible::before {
+.dynamic-tooltip.bottom {
+  transform: translateY(-6px);
+}
+
+.dynamic-tooltip.bottom.visible {
   transform: translateY(0);
 }
 
-/* Left edge elements (extend rightwards) */
-.help-badge[data-tip]::after {
-  left: -10px;
-  right: auto;
-  transform: translateY(4px);
-}
-
-/* Arrow stays centered on the badge */
-.help-badge[data-tip]::before {
+/* Tooltip Arrow - optional, but helps visual connection */
+.dynamic-tooltip::before {
+  content: '';
+  position: absolute;
   left: 50%;
-  transform: translateX(-50%) translateY(4px);
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--border) transparent transparent transparent;
+  bottom: -11px;
 }
 
-.help-badge[data-tip]:hover::after,
-.help-badge[data-tip]:focus-visible::after {
-  transform: translateY(0);
-}
-
-.help-badge[data-tip]:hover::before,
-.help-badge[data-tip]:focus-visible::before {
-  transform: translateX(-50%) translateY(0);
+.dynamic-tooltip.bottom::before {
+  bottom: auto;
+  top: -11px;
+  border-color: transparent transparent var(--border) transparent;
 }
 
 /* ── Help badge (?) ── */
+
 .help-badge {
   display: inline-flex;
   align-items: center;

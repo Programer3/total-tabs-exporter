@@ -5,6 +5,7 @@
  */
 
 import { runExport, fetchScopeOptions } from '../core/exportCoordinator.js';
+import { TooltipManager } from '../utils/tooltipManager.js';
 
 const STORAGE_KEY = 'tabExporterSettings';
 
@@ -24,6 +25,27 @@ const elToast       = $('toast');
 
 let toastTimer = null;
 
+/* ── Localization ── */
+function localizeUI() {
+  // Text content
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    const key = el.getAttribute('data-i18n');
+    const msg = browser.i18n.getMessage(key);
+    if (msg) {
+      // If it has children (like icons), we might want to append text or replace a specific child.
+      // But for this project, data-i18n is mostly on leaf nodes or containers where we replace all text.
+      el.textContent = msg;
+    }
+  });
+
+  // Aria labels
+  document.querySelectorAll('[data-i18n-aria]').forEach((el) => {
+    const key = el.getAttribute('data-i18n-aria');
+    const msg = browser.i18n.getMessage(key);
+    if (msg) { el.setAttribute('aria-label', msg); }
+  });
+}
+
 /* ── Toast ── */
 function showToast(msg, type = 'success', duration = 2800) {
   clearTimeout(toastTimer);
@@ -35,11 +57,11 @@ function showToast(msg, type = 'success', duration = 2800) {
 
 /* ── Progress ── */
 const STEP_LABELS = {
-  collecting: 'Collecting tabs…',
-  resolving:  'Resolving groups & containers…',
-  scoping:    'Applying scope…',
-  formatting: 'Formatting…',
-  delivering: 'Saving file…',
+  collecting: browser.i18n.getMessage('statusCollecting') || 'Collecting tabs…',
+  resolving:  browser.i18n.getMessage('statusResolving')  || 'Resolving groups & containers…',
+  scoping:    browser.i18n.getMessage('statusScoping')    || 'Applying scope…',
+  formatting: browser.i18n.getMessage('statusFormatting') || 'Formatting…',
+  delivering: browser.i18n.getMessage('statusDelivering') || 'Saving file…',
 };
 
 function setProgress(step, count) {
@@ -116,7 +138,7 @@ async function populateScope() {
     elScopeSelect.value = optionValues.includes(previousScope) ? previousScope : 'all';
 
   } catch (err) {
-    showToast(`⚠ Could not load scope: ${err.message}`, 'error');
+    showToast(browser.i18n.getMessage('toastScopeError', [err.message]), 'error');
   } finally {
     elRefreshBtn.disabled = false;
   }
@@ -125,7 +147,7 @@ async function populateScope() {
 /* ── Read current UI state ── */
 function getExportOptions(output) {
   const formatRadio = document.querySelector('input[name="format"]:checked');
-  return {
+  const options = {
     format:         formatRadio?.value ?? 'markdown',
     scope:          elScopeSelect.value,
     includeTitle:   elOptTitle.checked,
@@ -133,6 +155,8 @@ function getExportOptions(output) {
     output,
     onProgress:     (p) => setProgress(p.step, p.count),
   };
+  console.debug('[TabExporter] Export options:', { ...options, onProgress: 'fn' });
+  return options;
 }
 
 /* ── Export handler ── */
@@ -144,13 +168,13 @@ async function handleExport(output) {
     clearProgress();
 
     if (output === 'clipboard') {
-      showToast(`✓ ${result.count} tabs copied to clipboard`, 'success');
+      showToast(browser.i18n.getMessage('toastCopySuccess', [result.count.toString()]), 'success');
     } else {
-      showToast(`✓ ${result.count} tabs saved as ${result.filename}`, 'success');
+      showToast(browser.i18n.getMessage('toastDownloadSuccess', [result.count.toString(), result.filename]), 'success');
     }
   } catch (err) {
     clearProgress();
-    showToast(`✗ Export failed: ${err.message}`, 'error', 4000);
+    showToast(browser.i18n.getMessage('toastExportError', [err.message]), 'error', 4000);
     console.error('[TabExporter] export error:', err);
   } finally {
     setBusy(false);
@@ -159,6 +183,9 @@ async function handleExport(output) {
 
 /* ── Init ── */
 async function init() {
+  localizeUI();
+  new TooltipManager();
+
   await loadSettings();
   await populateScope();
 
