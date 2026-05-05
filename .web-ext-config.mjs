@@ -12,8 +12,9 @@ export default {
     ".web-ext-config.js",
     "package.json",
     "package-lock.json",
-    "README.md",
+    "Readme.md",
     "dev.md",
+    "Development.md",
     "jest.config.js",
     ".gitignore",
     ".gitattributes"
