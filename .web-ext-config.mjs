@@ -18,6 +18,7 @@ export default {
     "jest.config.js",
     ".gitignore",
     ".gitattributes",
-    ".rules"
+    ".rules",
+    "coverage"
   ],
 };
