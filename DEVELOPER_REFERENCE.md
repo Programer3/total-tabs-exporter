@@ -30,6 +30,8 @@ Total Tab Exporter is a lightweight Firefox extension that allows developers and
 | `core/tabCollector.js` | Interfaces with the browser API to query and normalize tab records. |
 | `core/groupResolver.js` | Grouping logic for parsing native tab groups and container contexts. |
 | `formatters/index.js` | Factory pattern registering and retrieving format engines. |
+| `options/options.js` | Form controller for configuring persistent settings (default format, default scope, target filters, log level). |
+| `options/options.html` | The HTML UI structure for the persistent options page. |
 
 ---
 
@@ -102,6 +104,11 @@ total-tab-exporter/
 │   ├── jsonFormatter.js          # JSON metadata exporter
 │   ├── markdownFormatter.js      # Markdown link list compiler
 │   └── textFormatter.js          # Raw titles and URLs exporter
+│
+├── options/                      # Persistent options/settings page assets
+│   ├── options.html              # Options page UI layout
+│   ├── options.css               # Styling using design rules
+│   └── options.js                # Form state management and runtime message handling
 │
 ├── popup/                        # Extension popup widget assets
 │   ├── popup.html                # Popup layout structure

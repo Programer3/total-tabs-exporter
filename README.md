@@ -14,7 +14,7 @@ Made this because I couldn't find any on firefox that can export "groups".
 | **4 Export Formats** | Markdown, JSON (with favicons), self-contained HTML, plain text |
 | **Tab Groups Support** | Firefox 131+ native tab groups with graceful degradation |
 | **Container Support** | Full Firefox Multi-Account Container support |
-| **Flexible Scope** | Export All tabs / specific group / specific container / ungrouped only |
+| **Flexible Scope** | Export All tabs / specific group / specific container / ungrouped only / active page |
 | **Smart Filtering** | Option to exclude internal pages (`about:`, `moz-extension:`, etc.) |
 | **Clipboard Integration** | One-click copy to clipboard instead of file download |
 | **Auto-generated Filenames** | `firefox-tabs-export-YYYY-MM-DD-HH-MM-SS.ext` |
@@ -22,6 +22,8 @@ Made this because I couldn't find any on firefox that can export "groups".
 | **High Performance** | Handles 1000+ tabs without freezing your browser |
 | **Privacy-First** | No data collection, no external network calls |
 
+---
+![alt text](<Screenshot-1.png>)
 ---
 
 ##  Installation
@@ -49,6 +51,7 @@ Made this because I couldn't find any on firefox that can export "groups".
 2. Choose your preferred **Format** (MD / JSON / HTML / TXT)
 3. Select the **Scope** of tabs to export:
    - **All Tabs**: Every open tab across all windows
+   - **This Page**: Only the current active webpage tab
    - **Current Group**: Tabs in your active tab group (Firefox 131+)
    - **Specific Container**: Tabs from a particular container
    - **Ungrouped Only**: Tabs not in any group
