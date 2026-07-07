@@ -27,8 +27,11 @@ Made this because I couldn't find any on firefox that can export "groups".
 ##  Installation
 
 ### From Firefox Add-ons (AMO) - Recommended
+
+[Directly go to Extension Page](https://addons.mozilla.org/en-US/firefox/addon/total-tabs-exporter) **Recommend**
+
 1. Visit [Firefox Add-ons](https://addons.mozilla.org/)
-2. Search for "Total Tabs Exporter" (WIP)
+2. Search for "Total Tabs Exporter" (LIVE NOW)
 3. Click "Add to Firefox"
 
 ### Manual Installation (Sideloading)
