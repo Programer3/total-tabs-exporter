@@ -23,7 +23,7 @@ Made this because I couldn't find any on firefox that can export "groups".
 | **Privacy-First** | No data collection, no external network calls |
 
 ---
-![alt text](<Screenshot-1.png>)
+![alt text](<screenshot-1.png>)
 ---
 
 ##  Installation
