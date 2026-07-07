@@ -56,7 +56,7 @@ global.browser = {
     },
   },
   runtime: {
-    getManifest:   jest.fn(() => ({ version: '1.0.0' })),
+    getManifest:   jest.fn(() => ({ version: '1.0.3' })),
     openOptionsPage: jest.fn(),
     onMessage:     { addListener: jest.fn() },
     onInstalled:   { addListener: jest.fn() },

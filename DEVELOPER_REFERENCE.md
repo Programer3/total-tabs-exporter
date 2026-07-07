@@ -10,7 +10,7 @@
 | Field | Value |
 |-------|-------|
 | **Project** | Total Tab Exporter |
-| **Version** | 1.0.2 |
+| **Version** | 1.0.3 |
 | **Tagline** | Firefox extension to export tabs in multiple formats (Markdown, JSON, HTML, plain text) |
 | **Tech Stack** | JavaScript (ESM), WebExtensions API, CSS (OKLCH), HTML5, Jest, Web-ext |
 

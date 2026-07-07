@@ -1,6 +1,6 @@
 {
   "name": "tab-exporter",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "description": "Firefox extension to export tabs in multiple formats",
   "private": true,
   "type": "module",
