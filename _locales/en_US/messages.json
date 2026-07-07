@@ -38,6 +38,9 @@
   "scopeAll": {
     "message": "All Tabs"
   },
+  "scopeCurrent": {
+    "message": "This Page"
+  },
   "scopeUngrouped": {
     "message": "Default / Ungrouped"
   },

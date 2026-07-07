@@ -24,6 +24,7 @@ const elStatusText  = $('status-text');
 const elToast       = $('toast');
 
 let toastTimer = null;
+let cachedGroupedTabs = null;
 
 /* ── Localization ── */
 function localizeUI() {
@@ -32,8 +33,6 @@ function localizeUI() {
     const key = el.getAttribute('data-i18n');
     const msg = browser.i18n.getMessage(key);
     if (msg) {
-      // If it has children (like icons), we might want to append text or replace a specific child.
-      // But for this project, data-i18n is mostly on leaf nodes or containers where we replace all text.
       el.textContent = msg;
     }
   });
@@ -95,33 +94,83 @@ async function loadSettings() {
   } catch { /* storage unavailable in tests — ignore */ }
 }
 
-/* ── Scope population ──
- * Always pass the current filterInternal toggle value so the tab count
- * shown in the UI matches exactly what will be exported.
- * Also called automatically when the filter toggle changes.
- */
+/* ── Update active count ── */
+async function updateTabCount() {
+  if (!cachedGroupedTabs) { return; }
+  const scope = elScopeSelect.value;
+  let count = 0;
+
+  if (scope === 'all') {
+    count = cachedGroupedTabs.all.length;
+  } else if (scope === 'current') {
+    const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true });
+    let isCurrentIncluded = true;
+    if (elOptFilter.checked && currentTab) {
+      const url = currentTab.url.toLowerCase();
+      if (url.startsWith('about:') ||
+          url.startsWith('moz-extension:') ||
+          url.startsWith('chrome-extension:') ||
+          url.startsWith('chrome:')) {
+        isCurrentIncluded = false;
+      }
+    }
+    count = isCurrentIncluded && currentTab ? 1 : 0;
+  } else if (scope === 'ungrouped') {
+    count = cachedGroupedTabs.ungrouped.length;
+  } else if (scope.startsWith('group:')) {
+    const id = scope.slice(6);
+    count = cachedGroupedTabs.groups[id]?.tabs.length ?? 0;
+  } else if (scope.startsWith('container:')) {
+    const id = scope.slice(10);
+    count = cachedGroupedTabs.containers[id]?.tabs.length ?? 0;
+  }
+
+  elTabCount.textContent = count;
+}
+
+/* ── Scope population ── */
 async function populateScope() {
   elRefreshBtn.disabled = true;
   try {
-    // Use same filter as export so count is consistent
     const filterInternal = elOptFilter.checked;
     const grouped = await fetchScopeOptions({ filterInternal });
-    elTabCount.textContent = grouped.all.length;
+    cachedGroupedTabs = grouped;
 
     // Remember currently selected scope so we can restore it after rebuild
     const previousScope = elScopeSelect.value;
 
     // Remove dynamic options, keep static ones
-    const staticValues = new Set(['all', 'ungrouped']);
+    const staticValues = new Set(['all', 'current', 'ungrouped']);
     [...elScopeSelect.options].forEach((opt) => {
       if (!staticValues.has(opt.value)) { opt.remove(); }
     });
+
+    // Calculate current tab availability
+    const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true });
+    let isCurrentIncluded = true;
+    if (filterInternal && currentTab) {
+      const url = currentTab.url.toLowerCase();
+      if (url.startsWith('about:') ||
+          url.startsWith('moz-extension:') ||
+          url.startsWith('chrome-extension:') ||
+          url.startsWith('chrome:')) {
+        isCurrentIncluded = false;
+      }
+    }
+    const currentCount = isCurrentIncluded && currentTab ? 1 : 0;
+
+    // Update This Page option text with count
+    const optCurrent = elScopeSelect.querySelector('option[value="current"]');
+    if (optCurrent) {
+      const baseText = browser.i18n.getMessage('scopeCurrent') || 'This Page';
+      optCurrent.textContent = `${baseText} (${currentCount})`;
+    }
 
     // Native groups
     for (const [id, { meta, tabs }] of Object.entries(grouped.groups)) {
       const opt       = document.createElement('option');
       opt.value       = `group:${id}`;
-      opt.textContent = `📁 Group: ${meta.name} (${tabs.length})`;
+      opt.textContent = `Group: ${meta.name} (${tabs.length})`;
       elScopeSelect.appendChild(opt);
     }
 
@@ -129,13 +178,15 @@ async function populateScope() {
     for (const [id, { meta, tabs }] of Object.entries(grouped.containers)) {
       const opt       = document.createElement('option');
       opt.value       = `container:${id}`;
-      opt.textContent = `🔷 Container: ${meta.name} (${tabs.length})`;
+      opt.textContent = `Container: ${meta.name} (${tabs.length})`;
       elScopeSelect.appendChild(opt);
     }
 
     // Restore previous selection if it still exists, otherwise fall back to 'all'
     const optionValues = [...elScopeSelect.options].map((o) => o.value);
     elScopeSelect.value = optionValues.includes(previousScope) ? previousScope : 'all';
+
+    await updateTabCount();
 
   } catch (err) {
     showToast(browser.i18n.getMessage('toastScopeError', [err.message]), 'error');
@@ -194,8 +245,7 @@ async function init() {
   elRefreshBtn.addEventListener('click',  populateScope);
   elSettingsBtn.addEventListener('click', () => browser.runtime.openOptionsPage());
 
-  // Re-populate scope + refresh count whenever filter toggle changes
-  // so the displayed number always equals what will actually be exported
+  elScopeSelect.addEventListener('change', updateTabCount);
   elOptFilter.addEventListener('change', populateScope);
 }
 

@@ -17,6 +17,7 @@ export default {
     "Development.md",
     "jest.config.js",
     ".gitignore",
-    ".gitattributes"
+    ".gitattributes",
+    ".rules"
   ],
 };

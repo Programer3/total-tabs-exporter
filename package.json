@@ -5,10 +5,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --experimental-vm-modules node_modules/.bin/jest --coverage",
-    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch",
-    "test:unit": "node --experimental-vm-modules node_modules/.bin/jest tests/unit",
-    "test:integration": "node --experimental-vm-modules node_modules/.bin/jest tests/integration",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
+    "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit",
+    "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/integration",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "package": "web-ext build --source-dir . --artifacts-dir dist --overwrite-dest",
@@ -22,14 +22,13 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "setupFiles": ["./tests/mocks/browser.mock.js"],
+    "setupFilesAfterEnv": ["./tests/mocks/browser.mock.js"],
     "testMatch": ["**/tests/**/*.test.js"],
     "collectCoverageFrom": [
       "core/**/*.js",
       "formatters/**/*.js",
       "utils/**/*.js"
     ],
-    "extensionsToTreatAsEsm": [".js"],
     "transform": {}
   }
 }

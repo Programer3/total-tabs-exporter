@@ -50,6 +50,12 @@ describe('exportCoordinator — full pipeline', () => {
     expect(result.count).toBe(1);   // Tab index 3 is in container
   });
 
+  test('runExport with scope=current exports only the active tab in the current window', async () => {
+    const result = await runExport({ format: 'text', scope: 'current', output: 'clipboard' });
+    expect(result.success).toBe(true);
+    expect(result.count).toBe(1); // tab 1 is active by default in the mock tabs
+  });
+
   test('runExport throws for unknown group scope', async () => {
     await expect(
       runExport({ format: 'text', scope: 'group:nonexistent', output: 'clipboard' })

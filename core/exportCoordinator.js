@@ -56,10 +56,19 @@ function generateFilename(format) {
  * Filters a GroupedTabs structure down to the requested scope.
  * @param {import('./groupResolver.js').GroupedTabs} groupedTabs
  * @param {ExportScope} scope
+ * @param {browser.tabs.Tab|null} [activeTabInCurrentWindow]
  * @returns {import('./groupResolver.js').GroupedTabs}
  */
-function applyScope(groupedTabs, scope) {
+function applyScope(groupedTabs, scope, activeTabInCurrentWindow = null) {
   if (scope === 'all') { return groupedTabs; }
+
+  if (scope === 'current') {
+    const matchedTab = activeTabInCurrentWindow
+      ? groupedTabs.all.find((t) => t.id === activeTabInCurrentWindow.id)
+      : null;
+    const tabs = matchedTab ? [matchedTab] : [];
+    return { all: tabs, groups: {}, containers: {}, ungrouped: tabs };
+  }
 
   if (scope === 'ungrouped') {
     return { all: groupedTabs.ungrouped, groups: {}, containers: {}, ungrouped: groupedTabs.ungrouped };
@@ -105,11 +114,17 @@ export async function runExport(options) {
   const allTabs = await collectTabs({ filterInternal });
   logger.info(`runExport: collected ${allTabs.length} tabs`);
 
+  let activeTab = null;
+  if (scope === 'current') {
+    const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+    activeTab = tab;
+  }
+
   onProgress({ step: 'resolving', count: allTabs.length });
   const groupedTabs  = await resolveTabs(allTabs);
 
   onProgress({ step: 'scoping', count: allTabs.length });
-  const scopedTabs   = applyScope(groupedTabs, scope);
+  const scopedTabs   = applyScope(groupedTabs, scope, activeTab);
   const tabCount     = scopedTabs.all.length;
   logger.info(`runExport: exporting ${tabCount} tabs (scope=${scope}, format=${format})`);
 

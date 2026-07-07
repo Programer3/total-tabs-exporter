@@ -4,6 +4,9 @@
  * Set as a Jest setupFile so it runs before every test file.
  */
 
+import { jest } from '@jest/globals';
+
+
 const makeMockTabs = (count = 5) =>
   Array.from({ length: count }, (_, i) => ({
     id:            i + 1,
@@ -21,7 +24,16 @@ const makeMockTabs = (count = 5) =>
 
 global.browser = {
   tabs: {
-    query: jest.fn(async () => makeMockTabs(5)),
+    query: jest.fn(async (queryObj = {}) => {
+      let tabs = makeMockTabs(5);
+      if (queryObj.active) {
+        tabs = tabs.filter((t) => t.active);
+      }
+      if (queryObj.currentWindow) {
+        tabs = tabs.filter((t) => t.windowId === 1);
+      }
+      return tabs;
+    }),
   },
   tabGroups: {
     query: jest.fn(async () => [
@@ -49,6 +61,13 @@ global.browser = {
     onMessage:     { addListener: jest.fn() },
     onInstalled:   { addListener: jest.fn() },
   },
+  i18n: {
+    getMessage: jest.fn((key) => {
+      if (key === 'errGroupNotFound') return 'Tab group not found.';
+      if (key === 'errContainerNotFound') return 'Container not found.';
+      return key;
+    }),
+  },
   action: {
     openPopup: jest.fn(),
   },
@@ -58,10 +77,13 @@ global.browser = {
   },
 };
 
-global.URL = {
-  createObjectURL: jest.fn(() => 'blob:mock-url'),
-  revokeObjectURL: jest.fn(),
-};
+// Extend the native URL constructor so new URL() still works in tests
+const NativeURL = global.URL || globalThis.URL;
+if (NativeURL) {
+  NativeURL.createObjectURL = jest.fn(() => 'blob:mock-url');
+  NativeURL.revokeObjectURL = jest.fn();
+}
+
 
 global.navigator = {
   clipboard: {

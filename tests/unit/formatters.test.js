@@ -5,21 +5,23 @@ import { TextFormatter }     from '../../formatters/textFormatter.js';
 import { getFormatter, getAvailableFormats } from '../../formatters/index.js';
 
 /** Minimal GroupedTabs fixture */
-const makeGroupedTabs = (overrides = {}) => ({
-  all: [
-    { id: 1, title: 'Example', url: 'https://example.com', favIconUrl: 'https://example.com/fav.ico', windowId: 1, groupId: 10, cookieStoreId: 'firefox-default', pinned: false, active: true, index: 0, discarded: false },
-    { id: 2, title: 'GitHub',  url: 'https://github.com',  favIconUrl: null, windowId: 1, groupId: -1, cookieStoreId: 'firefox-container-1', pinned: false, active: false, index: 1, discarded: false },
-    { id: 3, title: 'Bare',    url: 'https://bare.io',     favIconUrl: null, windowId: 1, groupId: -1, cookieStoreId: 'firefox-default', pinned: true, active: false, index: 2, discarded: false },
-  ],
-  groups: {
-    '10': { meta: { id: '10', name: 'Work', color: 'blue', type: 'group' }, tabs: [] },
-  },
-  containers: {
-    'firefox-container-1': { meta: { id: 'firefox-container-1', name: 'Personal', color: 'orange', type: 'container' }, tabs: [] },
-  },
-  ungrouped: [],
-  ...overrides,
-});
+const makeGroupedTabs = (overrides = {}) => {
+  const t1 = { id: 1, title: 'Example', url: 'https://example.com', favIconUrl: 'https://example.com/fav.ico', windowId: 1, groupId: 10, cookieStoreId: 'firefox-default', pinned: false, active: true, index: 0, discarded: false };
+  const t2 = { id: 2, title: 'GitHub',  url: 'https://github.com',  favIconUrl: null, windowId: 1, groupId: -1, cookieStoreId: 'firefox-container-1', pinned: false, active: false, index: 1, discarded: false };
+  const t3 = { id: 3, title: 'Bare',    url: 'https://bare.io',     favIconUrl: null, windowId: 1, groupId: -1, cookieStoreId: 'firefox-default', pinned: true, active: false, index: 2, discarded: false };
+
+  return {
+    all: [t1, t2, t3],
+    groups: {
+      '10': { meta: { id: '10', name: 'Work', color: 'blue', type: 'group' }, tabs: [t1] },
+    },
+    containers: {
+      'firefox-container-1': { meta: { id: 'firefox-container-1', name: 'Personal', color: 'orange', type: 'container' }, tabs: [t2] },
+    },
+    ungrouped: [t3],
+    ...overrides,
+  };
+};
 
 /* ── Formatter Registry ── */
 describe('formatter registry', () => {
@@ -51,12 +53,12 @@ describe('MarkdownFormatter', () => {
 
   test('includes tab URL as link when includeTitle=true', async () => {
     const out = await fmt.format(gt, { includeTitle: true });
-    expect(out).toContain('[Example](https://example.com)');
+    expect(out).toContain('[Example](https://example.com/)');
   });
 
   test('outputs raw URL when includeTitle=false', async () => {
     const out = await fmt.format(gt, { includeTitle: false });
-    expect(out).toContain('<https://example.com>');
+    expect(out).toContain('<https://example.com/>');
     expect(out).not.toContain('[Example]');
   });
 
@@ -153,7 +155,7 @@ describe('TextFormatter', () => {
     });
     const out = await fmt.format(gt, { includeTitle: true });
     expect(out).toContain('My Page');
-    expect(out).toContain('https://my.page');
+    expect(out).toContain('https://my.page/');
   });
 
   test('outputs only URL when includeTitle=false', async () => {
@@ -161,7 +163,7 @@ describe('TextFormatter', () => {
       ungrouped: [{ id: 9, title: 'My Page', url: 'https://my.page', favIconUrl: null, windowId: 1, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: false, index: 0, discarded: false }],
     });
     const out = await fmt.format(gt, { includeTitle: false });
-    expect(out).toContain('https://my.page');
+    expect(out).toContain('https://my.page/');
     expect(out).not.toContain('My Page');
   });
 });
