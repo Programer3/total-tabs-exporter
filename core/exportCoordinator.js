@@ -21,7 +21,7 @@
  * @property {string}   [filename]
  */
 
-import { collectTabs }    from './tabCollector.js';
+import { collectTabs, getCurrentWindowId, getWindowsInfo } from './tabCollector.js';
 import { resolveTabs }    from './groupResolver.js';
 import { getFormatter }   from '../formatters/index.js';
 import { downloadFile, copyToClipboard } from './downloader.js';
@@ -53,14 +53,53 @@ function generateFilename(format) {
 }
 
 /**
+ * Helper to filter grouped tabs down to a subset of TabRecords.
+ * @param {import('./groupResolver.js').GroupedTabs} groupedTabs
+ * @param {import('./tabCollector.js').TabRecord[]} subsetTabs
+ * @returns {import('./groupResolver.js').GroupedTabs}
+ */
+function filterGroupedTabs(groupedTabs, subsetTabs) {
+  const tabIdSet = new Set(subsetTabs.map((t) => t.id));
+  const groups = {};
+  for (const [id, entry] of Object.entries(groupedTabs.groups)) {
+    const matched = entry.tabs.filter((t) => tabIdSet.has(t.id));
+    if (matched.length > 0) {
+      groups[id] = { meta: entry.meta, tabs: matched };
+    }
+  }
+  const containers = {};
+  for (const [id, entry] of Object.entries(groupedTabs.containers)) {
+    const matched = entry.tabs.filter((t) => tabIdSet.has(t.id));
+    if (matched.length > 0) {
+      containers[id] = { meta: entry.meta, tabs: matched };
+    }
+  }
+  const ungrouped = groupedTabs.ungrouped.filter((t) => tabIdSet.has(t.id));
+  return { all: subsetTabs, groups, containers, ungrouped };
+}
+
+/**
  * Filters a GroupedTabs structure down to the requested scope.
  * @param {import('./groupResolver.js').GroupedTabs} groupedTabs
  * @param {ExportScope} scope
  * @param {browser.tabs.Tab|null} [activeTabInCurrentWindow]
+ * @param {number|null} [currentWindowId]
  * @returns {import('./groupResolver.js').GroupedTabs}
  */
-function applyScope(groupedTabs, scope, activeTabInCurrentWindow = null) {
+function applyScope(groupedTabs, scope, activeTabInCurrentWindow = null, currentWindowId = null) {
   if (scope === 'all') { return groupedTabs; }
+
+  if (scope === 'window:current') {
+    const targetWinId = currentWindowId ?? activeTabInCurrentWindow?.windowId;
+    const tabs = groupedTabs.all.filter((t) => t.windowId === targetWinId);
+    return filterGroupedTabs(groupedTabs, tabs);
+  }
+
+  if (scope.startsWith('window:')) {
+    const targetWinId = Number(scope.slice(7));
+    const tabs = groupedTabs.all.filter((t) => t.windowId === targetWinId);
+    return filterGroupedTabs(groupedTabs, tabs);
+  }
 
   if (scope === 'current') {
     const matchedTab = activeTabInCurrentWindow
@@ -104,6 +143,7 @@ export async function runExport(options) {
   const {
     format         = 'markdown',
     scope          = 'all',
+    windowScope    = 'all',
     includeTitle   = true,
     filterInternal = true,
     output         = 'download',
@@ -114,19 +154,33 @@ export async function runExport(options) {
   const allTabs = await collectTabs({ filterInternal });
   logger.info(`runExport: collected ${allTabs.length} tabs`);
 
+  const currentWinId = await getCurrentWindowId();
   let activeTab = null;
   if (scope === 'current') {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
     activeTab = tab;
   }
 
-  onProgress({ step: 'resolving', count: allTabs.length });
-  const groupedTabs  = await resolveTabs(allTabs);
+  // Pre-filter by windowScope if specified and not 'all'
+  let tabsToResolve = allTabs;
+  if (windowScope === 'current') {
+    tabsToResolve = allTabs.filter((t) => t.windowId === currentWinId);
+  } else if (windowScope && windowScope !== 'all') {
+    const targetId = typeof windowScope === 'string' && windowScope.startsWith('window:')
+      ? Number(windowScope.slice(7))
+      : Number(windowScope);
+    if (!isNaN(targetId)) {
+      tabsToResolve = allTabs.filter((t) => t.windowId === targetId);
+    }
+  }
 
-  onProgress({ step: 'scoping', count: allTabs.length });
-  const scopedTabs   = applyScope(groupedTabs, scope, activeTab);
+  onProgress({ step: 'resolving', count: tabsToResolve.length });
+  const groupedTabs  = await resolveTabs(tabsToResolve);
+
+  onProgress({ step: 'scoping', count: tabsToResolve.length });
+  const scopedTabs   = applyScope(groupedTabs, scope, activeTab, currentWinId);
   const tabCount     = scopedTabs.all.length;
-  logger.info(`runExport: exporting ${tabCount} tabs (scope=${scope}, format=${format})`);
+  logger.info(`runExport: exporting ${tabCount} tabs (windowScope=${windowScope}, scope=${scope}, format=${format})`);
 
   onProgress({ step: 'formatting', count: tabCount });
   const formatter = getFormatter(format);
@@ -148,13 +202,34 @@ export async function runExport(options) {
 
 /**
  * Fetches available scope options (groups + containers) for the popup UI.
- * Accepts the same filterInternal flag as runExport so the tab count
- * displayed in the popup matches what will actually be exported.
+ * Accepts filterInternal and windowScope to return precisely the scopes and windows matching.
  *
- * @param {{ filterInternal?: boolean }} [options]
- * @returns {Promise<import('./groupResolver.js').GroupedTabs>}
+ * @param {{ filterInternal?: boolean, windowScope?: string|number }} [options]
+ * @returns {Promise<import('./groupResolver.js').GroupedTabs & { windows: import('./tabCollector.js').WindowInfo[], currentWindowId: number, totalWindows: number, allTabsCount: number, scopedTabsCount: number }>}
  */
-export async function fetchScopeOptions({ filterInternal = false } = {}) {
-  const tabs = await collectTabs({ filterInternal });
-  return resolveTabs(tabs);
+export async function fetchScopeOptions({ filterInternal = false, windowScope = 'all' } = {}) {
+  const allTabs = await collectTabs({ filterInternal });
+  const { windows, currentWindowId } = await getWindowsInfo(allTabs);
+
+  let scopedTabs = allTabs;
+  if (windowScope === 'current') {
+    scopedTabs = allTabs.filter((t) => t.windowId === currentWindowId);
+  } else if (windowScope && windowScope !== 'all') {
+    const targetId = typeof windowScope === 'string' && windowScope.startsWith('window:')
+      ? Number(windowScope.slice(7))
+      : Number(windowScope);
+    if (!isNaN(targetId)) {
+      scopedTabs = allTabs.filter((t) => t.windowId === targetId);
+    }
+  }
+
+  const grouped = await resolveTabs(scopedTabs);
+  return {
+    ...grouped,
+    windows,
+    currentWindowId,
+    totalWindows: windows.length,
+    allTabsCount: allTabs.length,
+    scopedTabsCount: scopedTabs.length,
+  };
 }

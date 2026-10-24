@@ -20,7 +20,9 @@ export class TextFormatter {
 
     lines.push('EXPORTED FIREFOX TABS');
     lines.push(`Exported: ${now}`);
-    lines.push(`Total: ${groupedTabs.all.length} tab(s)`);
+    const windowIds = new Set(groupedTabs.all.map((t) => t.windowId).filter((id) => id !== undefined && id !== null));
+    const windowMeta = windowIds.size > 1 ? ` (${windowIds.size} WINDOWS)` : '';
+    lines.push(`Total: ${groupedTabs.all.length} tab(s)${windowMeta}`);
     lines.push(sep);
 
     // Native groups

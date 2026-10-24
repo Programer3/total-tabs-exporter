@@ -17,6 +17,7 @@ const DEFAULTS = {
   includeTitle:   true,
   filterInternal: true,
   defaultOutput:  'download',
+  defaultWindow:  'current',
 };
 
 const STORAGE_KEY = 'tabExporterSettings';
@@ -53,6 +54,7 @@ const elFormat        = $('default-format');
 const elIncludeTitle  = $('include-title');
 const elFilterInt     = $('filter-internal');
 const elDefaultOutput = $('default-output');
+const elDefaultWindow = $('default-window');
 const elSaveBtn       = $('save-btn');
 const elResetBtn      = $('reset-btn');
 const elStatus        = $('status-msg');
@@ -63,6 +65,9 @@ function applyToForm(settings) {
   elIncludeTitle.checked      = settings.includeTitle;
   elFilterInt.checked         = settings.filterInternal;
   elDefaultOutput.value       = settings.defaultOutput;
+  if (elDefaultWindow && settings.defaultWindow) {
+    elDefaultWindow.value     = settings.defaultWindow;
+  }
 }
 
 /** Reads current form values into a settings object */
@@ -72,6 +77,7 @@ function readFromForm() {
     includeTitle:   elIncludeTitle.checked,
     filterInternal: elFilterInt.checked,
     defaultOutput:  elDefaultOutput.value,
+    defaultWindow:  elDefaultWindow ? elDefaultWindow.value : 'current',
   };
 }
 

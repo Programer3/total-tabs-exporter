@@ -53,6 +53,18 @@
   "labelFormat": {
     "message": "Format"
   },
+  "labelWindow": {
+    "message": "Window"
+  },
+  "windowCurrent": {
+    "message": "This Window"
+  },
+  "windowAll": {
+    "message": "All Windows"
+  },
+  "labelDefaultWindow": {
+    "message": "Default Window"
+  },
   "labelScope": {
     "message": "Scope"
   },
@@ -61,6 +73,12 @@
   },
   "labelTabsReady": {
     "message": "tabs ready to export"
+  },
+  "labelTabsReadyCurrent": {
+    "message": "tabs ready to export (this window)"
+  },
+  "labelTabsReadyAll": {
+    "message": "tabs ready to export (all windows)"
   },
   "ariaSettings": {
     "message": "Open settings"
@@ -91,6 +109,9 @@
   },
   "tipFormatText": {
     "message": "Plain Text — simple list of tab titles and URLs. Works everywhere: email, Notepad, terminal, or any plain text tool."
+  },
+  "tipWindow": {
+    "message": "Choose whether to export tabs from the current window, all open windows, or a specific window."
   },
   "tipScope": {
     "message": "Choose which tabs to export: all open tabs, a specific tab group (colour-coded groups in your tab bar), a Firefox Container, or only the ungrouped tabs."

@@ -29,6 +29,9 @@ export class HtmlFormatter {
       parts.push(await this._section('🔗 Default / Ungrouped', 'gray', groupedTabs.ungrouped, includeTitle, 'default'));
     }
 
+    const windowIds = new Set(groupedTabs.all.map((t) => t.windowId).filter((id) => id !== undefined && id !== null));
+    const windowMeta = windowIds.size > 1 ? ` (${windowIds.size} windows)` : '';
+
     return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,7 +63,7 @@ export class HtmlFormatter {
 </head>
 <body>
   <h1>Exported Firefox Tabs</h1>
-  <p class="meta">Exported: ${escapeHtml(now)} &nbsp;·&nbsp; ${total} tab${total !== 1 ? 's' : ''}</p>
+  <p class="meta">Exported: ${escapeHtml(now)} &nbsp;·&nbsp; ${total} tab${total !== 1 ? 's' : ''}${escapeHtml(windowMeta)}</p>
   ${parts.join('\n  ')}
 </body>
 </html>`;

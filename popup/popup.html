@@ -30,7 +30,7 @@
       data-i18n-tip="tipTabSummary"
       aria-live="polite">
       <span class="summary-count" id="tab-count">—</span>
-      <span class="summary-label" data-i18n="labelTabsReady">tabs ready to export</span>
+      <span class="summary-label" id="summary-label" data-i18n="labelTabsReady">tabs ready to export</span>
     </div>
 
     <div class="divider"></div>
@@ -68,6 +68,21 @@
           <span class="fmt-name" data-i18n="formatText">Text</span>
         </label>
 
+      </div>
+    </section>
+
+    <!-- Window selection (shown when >1 window open) -->
+    <section class="section" id="window-section" data-i18n-aria="labelWindow" aria-label="Export Window" hidden>
+      <div class="section-label">
+        <span data-i18n="labelWindow">Window</span>
+        <span class="help-badge"
+          data-i18n-tip="tipWindow">?</span>
+      </div>
+      <div class="window-row">
+        <select id="window-select" class="select" data-i18n-aria="labelWindow" aria-label="Export window">
+          <option value="current" data-i18n="windowCurrent">This Window</option>
+          <option value="all" data-i18n="windowAll">All Windows</option>
+        </select>
       </div>
     </section>
 

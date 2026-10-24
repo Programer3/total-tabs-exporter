@@ -1,6 +1,6 @@
 {
   "name": "tab-exporter",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "Firefox extension to export tabs in multiple formats",
   "private": true,
   "type": "module",
@@ -22,8 +22,12 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "setupFilesAfterEnv": ["./tests/mocks/browser.mock.js"],
-    "testMatch": ["**/tests/**/*.test.js"],
+    "setupFilesAfterEnv": [
+      "./tests/mocks/browser.mock.js"
+    ],
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
     "collectCoverageFrom": [
       "core/**/*.js",
       "formatters/**/*.js",

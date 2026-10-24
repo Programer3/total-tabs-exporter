@@ -11,20 +11,24 @@ const STORAGE_KEY = 'tabExporterSettings';
 
 /* ── DOM refs ── */
 const $ = (id) => document.getElementById(id);
-const elTabCount    = $('tab-count');
-const elScopeSelect = $('scope-select');
-const elRefreshBtn  = $('refresh-scope');
-const elSettingsBtn = $('settings-btn');
-const elOptTitle    = $('opt-title');
-const elOptFilter   = $('opt-filter');
-const elBtnDownload = $('btn-download');
-const elBtnCopy     = $('btn-copy');
-const elStatusBar   = $('status-bar');
-const elStatusText  = $('status-text');
-const elToast       = $('toast');
+const elTabCount      = $('tab-count');
+const elSummaryLabel  = $('summary-label');
+const elWindowSection = $('window-section');
+const elWindowSelect  = $('window-select');
+const elScopeSelect   = $('scope-select');
+const elRefreshBtn    = $('refresh-scope');
+const elSettingsBtn   = $('settings-btn');
+const elOptTitle      = $('opt-title');
+const elOptFilter     = $('opt-filter');
+const elBtnDownload   = $('btn-download');
+const elBtnCopy       = $('btn-copy');
+const elStatusBar     = $('status-bar');
+const elStatusText    = $('status-text');
+const elToast         = $('toast');
 
 let toastTimer = null;
 let cachedGroupedTabs = null;
+let savedDefaultWindow = 'current';
 
 /* ── Localization ── */
 function localizeUI() {
@@ -87,6 +91,10 @@ async function loadSettings() {
     if (!s) { return; }
     if (s.includeTitle   !== undefined) { elOptTitle.checked  = s.includeTitle; }
     if (s.filterInternal !== undefined) { elOptFilter.checked = s.filterInternal; }
+    if (s.defaultWindow) {
+      savedDefaultWindow = s.defaultWindow;
+      if (elWindowSelect) { elWindowSelect.value = s.defaultWindow; }
+    }
     if (s.defaultFormat) {
       const radio = document.querySelector(`input[name="format"][value="${s.defaultFormat}"]`);
       if (radio) { radio.checked = true; }
@@ -126,6 +134,21 @@ async function updateTabCount() {
   }
 
   elTabCount.textContent = count;
+
+  // Update summary label to reflect window context
+  if (elSummaryLabel) {
+    if (cachedGroupedTabs.totalWindows > 1 && !elWindowSection.hidden) {
+      if (elWindowSelect.value === 'all') {
+        elSummaryLabel.textContent = browser.i18n.getMessage('labelTabsReadyAll') || 'tabs ready to export (all windows)';
+      } else if (elWindowSelect.value === 'current') {
+        elSummaryLabel.textContent = browser.i18n.getMessage('labelTabsReadyCurrent') || 'tabs ready to export (this window)';
+      } else {
+        elSummaryLabel.textContent = browser.i18n.getMessage('labelTabsReady') || 'tabs ready to export';
+      }
+    } else {
+      elSummaryLabel.textContent = browser.i18n.getMessage('labelTabsReady') || 'tabs ready to export';
+    }
+  }
 }
 
 /* ── Scope population ── */
@@ -133,13 +156,56 @@ async function populateScope() {
   elRefreshBtn.disabled = true;
   try {
     const filterInternal = elOptFilter.checked;
-    const grouped = await fetchScopeOptions({ filterInternal });
+    const selectedWindowScope = elWindowSelect && !elWindowSection.hidden
+      ? elWindowSelect.value
+      : (savedDefaultWindow || 'current');
+
+    const grouped = await fetchScopeOptions({ filterInternal, windowScope: selectedWindowScope });
     cachedGroupedTabs = grouped;
 
-    // Remember currently selected scope so we can restore it after rebuild
-    const previousScope = elScopeSelect.value;
+    // Handle Window Section visibility & options
+    if (grouped.totalWindows > 1) {
+      elWindowSection.hidden = false;
+      const prevWinVal = elWindowSelect.value;
+      elWindowSelect.innerHTML = '';
 
-    // Remove dynamic options, keep static ones
+      // 1. This Window option
+      const currentWin = grouped.windows.find((w) => w.isCurrent);
+      const optCurrentWin = document.createElement('option');
+      optCurrentWin.value = 'current';
+      const currentCount = currentWin?.tabCount ?? 0;
+      const currentTabWord = currentCount === 1 ? 'tab' : 'tabs';
+      optCurrentWin.textContent = `${browser.i18n.getMessage('windowCurrent') || 'This Window'} (${currentCount} ${currentTabWord})`;
+      elWindowSelect.appendChild(optCurrentWin);
+
+      // 2. All Windows option
+      const optAllWin = document.createElement('option');
+      optAllWin.value = 'all';
+      const allCount = grouped.allTabsCount ?? 0;
+      const allTabWord = allCount === 1 ? 'tab' : 'tabs';
+      optAllWin.textContent = `${browser.i18n.getMessage('windowAll') || 'All Windows'} (${allCount} ${allTabWord})`;
+      elWindowSelect.appendChild(optAllWin);
+
+      // 3. Other specific windows: Window N (X tabs)
+      grouped.windows.filter((w) => !w.isCurrent).forEach((w) => {
+        const optOtherWin = document.createElement('option');
+        optOtherWin.value = `window:${w.id}`;
+        const tabWord = w.tabCount === 1 ? 'tab' : 'tabs';
+        optOtherWin.textContent = `Window ${w.index} (${w.tabCount} ${tabWord})`;
+        elWindowSelect.appendChild(optOtherWin);
+      });
+
+      // Restore previous window selection if valid, else fall back to saved default or 'current'
+      const validWinVals = [...elWindowSelect.options].map((o) => o.value);
+      elWindowSelect.value = validWinVals.includes(prevWinVal)
+        ? prevWinVal
+        : (validWinVals.includes(savedDefaultWindow) ? savedDefaultWindow : 'current');
+    } else {
+      elWindowSection.hidden = true;
+    }
+
+    // Scope selection population
+    const previousScope = elScopeSelect.value;
     const staticValues = new Set(['all', 'current', 'ungrouped']);
     [...elScopeSelect.options].forEach((opt) => {
       if (!staticValues.has(opt.value)) { opt.remove(); }
@@ -159,11 +225,30 @@ async function populateScope() {
     }
     const currentCount = isCurrentIncluded && currentTab ? 1 : 0;
 
+    // Update All Tabs option text
+    const optAll = elScopeSelect.querySelector('option[value="all"]');
+    if (optAll) {
+      const isAllWin = elWindowSelect && !elWindowSection.hidden && elWindowSelect.value === 'all';
+      const allLabel = isAllWin
+        ? `${browser.i18n.getMessage('scopeAll') || 'All Tabs'} (All Windows)`
+        : (grouped.totalWindows > 1
+            ? `${browser.i18n.getMessage('scopeAll') || 'All Tabs'} (This Window)`
+            : (browser.i18n.getMessage('scopeAll') || 'All Tabs'));
+      optAll.textContent = `${allLabel} (${grouped.all.length})`;
+    }
+
     // Update This Page option text with count
     const optCurrent = elScopeSelect.querySelector('option[value="current"]');
     if (optCurrent) {
       const baseText = browser.i18n.getMessage('scopeCurrent') || 'This Page';
       optCurrent.textContent = `${baseText} (${currentCount})`;
+    }
+
+    // Update Ungrouped option text with count
+    const optUngrouped = elScopeSelect.querySelector('option[value="ungrouped"]');
+    if (optUngrouped) {
+      const baseText = browser.i18n.getMessage('scopeUngrouped') || 'Default / Ungrouped';
+      optUngrouped.textContent = `${baseText} (${grouped.ungrouped.length})`;
     }
 
     // Native groups
@@ -198,9 +283,14 @@ async function populateScope() {
 /* ── Read current UI state ── */
 function getExportOptions(output) {
   const formatRadio = document.querySelector('input[name="format"]:checked');
+  const windowScope = elWindowSelect && !elWindowSection.hidden
+    ? elWindowSelect.value
+    : 'all';
+
   const options = {
     format:         formatRadio?.value ?? 'markdown',
     scope:          elScopeSelect.value,
+    windowScope,
     includeTitle:   elOptTitle.checked,
     filterInternal: elOptFilter.checked,
     output,
@@ -245,6 +335,9 @@ async function init() {
   elRefreshBtn.addEventListener('click',  populateScope);
   elSettingsBtn.addEventListener('click', () => browser.runtime.openOptionsPage());
 
+  if (elWindowSelect) {
+    elWindowSelect.addEventListener('change', populateScope);
+  }
   elScopeSelect.addEventListener('change', updateTabCount);
   elOptFilter.addEventListener('change', populateScope);
 }

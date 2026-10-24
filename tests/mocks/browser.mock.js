@@ -9,17 +9,17 @@ import { jest } from '@jest/globals';
 
 const makeMockTabs = (count = 5) =>
   Array.from({ length: count }, (_, i) => ({
-    id:            i + 1,
-    title:         `Tab ${i + 1}`,
-    url:           `https://example.com/page${i + 1}`,
-    favIconUrl:    `https://example.com/favicon${i + 1}.ico`,
-    windowId:      1,
-    groupId:       i < 2 ? 10 : -1,  // first 2 tabs in group 10
+    id: i + 1,
+    title: `Tab ${i + 1}`,
+    url: `https://example.com/page${i + 1}`,
+    favIconUrl: `https://example.com/favicon${i + 1}.ico`,
+    windowId: 1,
+    groupId: i < 2 ? 10 : -1,  // first 2 tabs in group 10
     cookieStoreId: i === 3 ? 'firefox-container-1' : 'firefox-default',
-    pinned:        i === 0,
-    active:        i === 0,
-    index:         i,
-    discarded:     false,
+    pinned: i === 0,
+    active: i === 0,
+    index: i,
+    discarded: false,
   }));
 
 global.browser = {
@@ -32,8 +32,18 @@ global.browser = {
       if (queryObj.currentWindow) {
         tabs = tabs.filter((t) => t.windowId === 1);
       }
+      if (queryObj.windowId !== undefined) {
+        tabs = tabs.filter((t) => t.windowId === queryObj.windowId);
+      }
       return tabs;
     }),
+  },
+  windows: {
+    getCurrent: jest.fn(async () => ({ id: 1, focused: true, type: 'normal' })),
+    getAll: jest.fn(async () => [
+      { id: 1, focused: true, type: 'normal', title: 'Window 1' },
+    ]),
+    get: jest.fn(async (id) => ({ id, focused: id === 1, type: 'normal' })),
   },
   tabGroups: {
     query: jest.fn(async () => [
@@ -50,16 +60,16 @@ global.browser = {
   },
   storage: {
     local: {
-      get:    jest.fn(async () => ({})),
-      set:    jest.fn(async () => {}),
-      remove: jest.fn(async () => {}),
+      get: jest.fn(async () => ({})),
+      set: jest.fn(async () => { }),
+      remove: jest.fn(async () => { }),
     },
   },
   runtime: {
-    getManifest:   jest.fn(() => ({ version: '1.0.3' })),
+    getManifest: jest.fn(() => ({ version: '1.1.0' })),
     openOptionsPage: jest.fn(),
-    onMessage:     { addListener: jest.fn() },
-    onInstalled:   { addListener: jest.fn() },
+    onMessage: { addListener: jest.fn() },
+    onInstalled: { addListener: jest.fn() },
   },
   i18n: {
     getMessage: jest.fn((key) => {
@@ -72,8 +82,8 @@ global.browser = {
     openPopup: jest.fn(),
   },
   contextMenus: {
-    create:       jest.fn(),
-    onClicked:    { addListener: jest.fn() },
+    create: jest.fn(),
+    onClicked: { addListener: jest.fn() },
   },
 };
 
@@ -87,7 +97,7 @@ if (NativeURL) {
 
 global.navigator = {
   clipboard: {
-    writeText: jest.fn(async () => {}),
+    writeText: jest.fn(async () => { }),
   },
 };
 
@@ -100,6 +110,11 @@ global.resetBrowserMocks = () => {
   browser.storage.local.get.mockClear();
   browser.storage.local.set.mockClear();
   navigator.clipboard.writeText.mockClear();
+  if (global.browser.windows) {
+    global.browser.windows.getCurrent.mockClear();
+    global.browser.windows.getAll.mockClear();
+    global.browser.windows.get.mockClear();
+  }
 };
 
 /** Override tab data for specific tests */

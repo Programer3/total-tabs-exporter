@@ -1,4 +1,4 @@
-import { collectTabs } from '../../core/tabCollector.js';
+import { collectTabs, getCurrentWindowId, getWindowsInfo } from '../../core/tabCollector.js';
 
 describe('tabCollector', () => {
   beforeEach(() => resetBrowserMocks());
@@ -24,6 +24,16 @@ describe('tabCollector', () => {
     await collectTabs();
     expect(browser.tabs.query).toHaveBeenCalledTimes(1);
     expect(browser.tabs.query).toHaveBeenCalledWith({});
+  });
+
+  test('filters by windowId when windowId parameter is provided', async () => {
+    await collectTabs({ windowId: 2 });
+    expect(browser.tabs.query).toHaveBeenCalledWith({ windowId: 2 });
+  });
+
+  test('filters by currentWindow when currentWindow=true', async () => {
+    await collectTabs({ currentWindow: true });
+    expect(browser.tabs.query).toHaveBeenCalledWith({ currentWindow: true });
   });
 
   test('filters internal pages when filterInternal=true (default)', async () => {
@@ -55,6 +65,36 @@ describe('tabCollector', () => {
     expect(tabs[0].url).toBe('');
     expect(tabs[0].favIconUrl).toBeNull();
     expect(tabs[0].pinned).toBe(false);
+  });
+
+  test('getCurrentWindowId returns current window id', async () => {
+    const wid = await getCurrentWindowId();
+    expect(wid).toBe(1);
+  });
+
+  test('getWindowsInfo correctly groups tabs and identifies current window', async () => {
+    const multiWinTabs = [
+      { id: 1, title: 'Window 1 Active', url: 'https://site1.com', windowId: 1, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: true, index: 0, discarded: false },
+      { id: 2, title: 'Window 1 Tab 2',  url: 'https://site2.com', windowId: 1, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: false, index: 1, discarded: false },
+      { id: 3, title: 'Window 2 Active', url: 'https://site3.com', windowId: 2, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: true, index: 0, discarded: false },
+    ];
+    browser.windows.getAll.mockResolvedValueOnce([
+      { id: 1, focused: true, type: 'normal' },
+      { id: 2, focused: false, type: 'normal' },
+    ]);
+
+    const { windows, currentWindowId } = await getWindowsInfo(multiWinTabs);
+    expect(currentWindowId).toBe(1);
+    expect(windows).toHaveLength(2);
+    expect(windows[0].isCurrent).toBe(true);
+    expect(windows[0].id).toBe(1);
+    expect(windows[0].tabCount).toBe(2);
+    expect(windows[0].title).toBe('Window 1 Active');
+
+    expect(windows[1].isCurrent).toBe(false);
+    expect(windows[1].id).toBe(2);
+    expect(windows[1].tabCount).toBe(1);
+    expect(windows[1].title).toBe('Window 2 Active');
   });
 
   test('handles 1000 tabs efficiently', async () => {

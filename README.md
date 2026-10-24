@@ -12,6 +12,7 @@ Made this because I couldn't find any on firefox that can export "groups".
 | Feature | Description |
 |---|---|
 | **4 Export Formats** | Markdown, JSON (with favicons), self-contained HTML, plain text |
+| **Window Aware** | Export from current window only, all open windows, or any specific window |
 | **Tab Groups Support** | Firefox 131+ native tab groups with graceful degradation |
 | **Container Support** | Full Firefox Multi-Account Container support |
 | **Flexible Scope** | Export All tabs / specific group / specific container / ungrouped only / active page |
@@ -49,15 +50,19 @@ Made this because I couldn't find any on firefox that can export "groups".
 ### Basic Export
 1. Click the **⬡ Total Tab Exporter** icon in your Firefox toolbar
 2. Choose your preferred **Format** (MD / JSON / HTML / TXT)
-3. Select the **Scope** of tabs to export:
-   - **All Tabs**: Every open tab across all windows
+3. If multiple windows are open, choose the **Window** to export:
+   - **Current Window**: Export only tabs open in the active window
+   - **All Windows**: Export all open tabs across all browser windows
+   - **Specific Window**: Export tabs from a particular window (identified with tab counts and active page titles)
+4. Select the **Scope** of tabs to export:
+   - **All Tabs**: All tabs within the selected window scope
    - **This Page**: Only the current active webpage tab
    - **Current Group**: Tabs in your active tab group (Firefox 131+)
    - **Specific Container**: Tabs from a particular container
    - **Ungrouped Only**: Tabs not in any group
-4. Toggle **Include tab title** if you want group/container names included
-5. Toggle **Filter internal pages** to exclude Firefox system pages
-6. Choose **Download** to save as a file, or **Copy** to copy to clipboard
+5. Toggle **Include tab title** if you want group/container names included
+6. Toggle **Filter internal pages** to exclude Firefox system pages
+7. Choose **Download** to save as a file, or **Copy** to copy to clipboard
 
 ### Advanced Features
 - **Settings Page**: Click the gear icon (⚙) in the popup to access persistent settings

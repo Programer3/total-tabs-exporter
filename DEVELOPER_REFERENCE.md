@@ -10,7 +10,7 @@
 | Field | Value |
 |-------|-------|
 | **Project** | Total Tab Exporter |
-| **Version** | 1.0.3 |
+| **Version** | 1.1.0 |
 | **Tagline** | Firefox extension to export tabs in multiple formats (Markdown, JSON, HTML, plain text) |
 | **Tech Stack** | JavaScript (ESM), WebExtensions API, CSS (OKLCH), HTML5, Jest, Web-ext |
 
@@ -147,11 +147,12 @@ Thin presentation layer that binds click events, checkbox changes, and dropdown 
 
 ### 4.2 Orchestrator — `core/exportCoordinator.js`
 Main async coordinator executing the sequential pipeline:
-1. `collectTabs({ filterInternal })`
-2. `resolveTabs(allTabs)`
-3. `applyScope(groupedTabs, scope, activeTab)`
-4. `getFormatter(format).format(scopedTabs, { includeTitle })`
-5. Delivers the result to `downloadFile` or `copyToClipboard`.
+1. `collectTabs({ filterInternal })` and `getWindowsInfo(allTabs)` / `getCurrentWindowId()`
+2. Filter tabs by `windowScope` (`'current'`, `'all'`, or specific window ID)
+3. `resolveTabs(tabsToResolve)`
+4. `applyScope(groupedTabs, scope, activeTab, currentWinId)`
+5. `getFormatter(format).format(scopedTabs, { includeTitle })`
+6. Delivers the result to `downloadFile` or `copyToClipboard`.
 
 ---
 

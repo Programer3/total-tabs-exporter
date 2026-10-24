@@ -14,11 +14,13 @@ export class JsonFormatter {
    * @returns {Promise<string>}
    */
   async format(groupedTabs, { includeTitle = true } = {}) {
+    const windowIds = [...new Set(groupedTabs.all.map((t) => t.windowId).filter((id) => id !== undefined && id !== null))];
     const output = {
       meta: {
         exportedAt:    new Date().toISOString(),
         browser:       'Firefox',
         totalTabs:     groupedTabs.all.length,
+        totalWindows:  windowIds.length,
         includeTitle,
       },
       groups:     this._serializeEntries(groupedTabs.groups,     includeTitle),

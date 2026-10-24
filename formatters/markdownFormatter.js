@@ -19,7 +19,9 @@ export class MarkdownFormatter {
 
     lines.push('# Exported Firefox Tabs', '');
     lines.push(`> **Exported:** ${now}  `);
-    lines.push(`> **Total tabs:** ${groupedTabs.all.length}`, '');
+    const windowIds = new Set(groupedTabs.all.map((t) => t.windowId).filter((id) => id !== undefined && id !== null));
+    const windowMeta = windowIds.size > 1 ? ` (across ${windowIds.size} windows)` : '';
+    lines.push(`> **Total tabs:** ${groupedTabs.all.length}${windowMeta}`, '');
     lines.push('---', '');
 
     // Native groups

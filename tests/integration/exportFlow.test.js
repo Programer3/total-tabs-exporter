@@ -88,13 +88,67 @@ describe('exportCoordinator — full pipeline', () => {
     expect(steps).toContain('delivering');
   });
 
-  test('fetchScopeOptions returns grouped structure', async () => {
+  test('fetchScopeOptions returns grouped structure and window info', async () => {
     const grouped = await fetchScopeOptions();
     expect(grouped).toHaveProperty('all');
     expect(grouped).toHaveProperty('groups');
     expect(grouped).toHaveProperty('containers');
     expect(grouped).toHaveProperty('ungrouped');
+    expect(grouped).toHaveProperty('windows');
+    expect(grouped).toHaveProperty('currentWindowId');
+    expect(grouped).toHaveProperty('totalWindows');
     expect(Array.isArray(grouped.all)).toBe(true);
+    expect(Array.isArray(grouped.windows)).toBe(true);
+  });
+
+  test('runExport with windowScope=current exports only tabs in current window', async () => {
+    const multiWinTabs = [
+      { id: 1, title: 'W1 T1', url: 'https://site1.com', windowId: 1, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: true, index: 0, discarded: false },
+      { id: 2, title: 'W1 T2', url: 'https://site2.com', windowId: 1, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: false, index: 1, discarded: false },
+      { id: 3, title: 'W2 T1', url: 'https://site3.com', windowId: 2, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: false, index: 0, discarded: false },
+      { id: 4, title: 'W2 T2', url: 'https://site4.com', windowId: 2, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: false, index: 1, discarded: false },
+      { id: 5, title: 'W2 T3', url: 'https://site5.com', windowId: 2, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: false, index: 2, discarded: false },
+    ];
+    browser.tabs.query.mockResolvedValue(multiWinTabs);
+
+    const resultCurrent = await runExport({ format: 'text', scope: 'all', windowScope: 'current', output: 'clipboard' });
+    expect(resultCurrent.count).toBe(2);
+
+    const resultAll = await runExport({ format: 'text', scope: 'all', windowScope: 'all', output: 'clipboard' });
+    expect(resultAll.count).toBe(5);
+
+    const resultWin2 = await runExport({ format: 'text', scope: 'all', windowScope: 2, output: 'clipboard' });
+    expect(resultWin2.count).toBe(3);
+  });
+
+  test('runExport with scope=window:current and scope=window:2', async () => {
+    const multiWinTabs = [
+      { id: 1, title: 'W1 T1', url: 'https://site1.com', windowId: 1, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: true, index: 0, discarded: false },
+      { id: 2, title: 'W2 T1', url: 'https://site2.com', windowId: 2, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: false, index: 0, discarded: false },
+    ];
+    browser.tabs.query.mockResolvedValue(multiWinTabs);
+
+    const resultCurrent = await runExport({ format: 'markdown', scope: 'window:current', output: 'clipboard' });
+    expect(resultCurrent.count).toBe(1);
+
+    const resultWin2 = await runExport({ format: 'markdown', scope: 'window:2', output: 'clipboard' });
+    expect(resultWin2.count).toBe(1);
+  });
+
+  test('fetchScopeOptions filters groups and tabs when windowScope is specified', async () => {
+    const multiWinTabs = [
+      { id: 1, title: 'W1 T1', url: 'https://site1.com', windowId: 1, groupId: 10, cookieStoreId: 'firefox-default', pinned: false, active: true, index: 0, discarded: false },
+      { id: 2, title: 'W2 T1', url: 'https://site2.com', windowId: 2, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: false, index: 0, discarded: false },
+    ];
+    browser.tabs.query.mockResolvedValue(multiWinTabs);
+
+    const scopedWin1 = await fetchScopeOptions({ windowScope: 'current' });
+    expect(scopedWin1.all).toHaveLength(1);
+    expect(scopedWin1.groups['10']).toBeDefined();
+
+    const scopedWin2 = await fetchScopeOptions({ windowScope: 2 });
+    expect(scopedWin2.all).toHaveLength(1);
+    expect(scopedWin2.groups['10']).toBeUndefined();
   });
 
   test('pipeline handles 1000 tabs in all formats', async () => {
