@@ -43,7 +43,7 @@
 
 ---
 
-![Total Tab Exporter](screenshot-1.png)
+![Total Tab Exporter](ui-ss.png)
 
 ---
 
