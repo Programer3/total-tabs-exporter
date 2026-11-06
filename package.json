@@ -1,7 +1,12 @@
 {
   "name": "tab-exporter",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Firefox extension to export tabs in multiple formats",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/programer3/total-tabs-exporter.git"
+  },
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,7 +14,7 @@
     "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch",
     "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/unit",
     "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js tests/integration",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "lint:fix": "eslint . --fix",
     "package": "web-ext build --source-dir . --artifacts-dir dist --overwrite-dest",
     "sign": "web-ext sign --source-dir . --artifacts-dir dist",
@@ -33,6 +38,14 @@
       "formatters/**/*.js",
       "utils/**/*.js"
     ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 80,
+        "branches": 70,
+        "functions": 80,
+        "lines": 80
+      }
+    },
     "transform": {}
   }
 }

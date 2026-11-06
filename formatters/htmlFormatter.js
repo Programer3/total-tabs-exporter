@@ -20,13 +20,13 @@ export class HtmlFormatter {
 
     // Sections
     for (const entry of Object.values(groupedTabs.groups)) {
-      parts.push(await this._section(`📁 Group: ${entry.meta.name}`, entry.meta.color, entry.tabs, includeTitle, 'group'));
+      parts.push(await this._section(`Group: ${entry.meta.name}`, entry.meta.color, entry.tabs, includeTitle, 'group'));
     }
     for (const entry of Object.values(groupedTabs.containers)) {
-      parts.push(await this._section(`🔷 Container: ${entry.meta.name}`, entry.meta.color, entry.tabs, includeTitle, 'container'));
+      parts.push(await this._section(`Container: ${entry.meta.name}`, entry.meta.color, entry.tabs, includeTitle, 'container'));
     }
     if (groupedTabs.ungrouped.length > 0) {
-      parts.push(await this._section('🔗 Default / Ungrouped', 'gray', groupedTabs.ungrouped, includeTitle, 'default'));
+      parts.push(await this._section('Default / Ungrouped', 'gray', groupedTabs.ungrouped, includeTitle, 'default'));
     }
 
     const windowIds = new Set(groupedTabs.all.map((t) => t.windowId).filter((id) => id !== undefined && id !== null));
@@ -99,11 +99,11 @@ export class HtmlFormatter {
     const safeTitle = includeTitle && tab.title
       ? escapeHtml(truncate(tab.title, 120))
       : escapeHtml(truncate(tab.url, 80));
-    const pinnedBadge = tab.pinned ? '<span class="pinned-badge">📌 pinned</span>' : '';
+    const pinnedBadge = tab.pinned ? '<span class="pinned-badge">pinned</span>' : '';
 
     const faviconHtml = tab.favIconUrl
       ? `<img class="favicon" src="${escapeHtml(tab.favIconUrl)}" alt="" loading="lazy" onerror="this.style.display='none'">`
-      : `<span class="favicon-fallback">🌐</span>`;
+      : `<span class="favicon-fallback" aria-hidden="true"></span>`;
 
     return `<li class="tab-item">
         ${faviconHtml}

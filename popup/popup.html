@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Total Tab Exporter</title>
+  <link rel="stylesheet" href="theme.css">
   <link rel="stylesheet" href="popup.css">
 </head>
 
@@ -88,27 +89,53 @@
 
     <!-- Scope selection -->
     <section class="section" data-i18n-aria="labelScope" aria-label="Export Scope">
-      <div class="section-label">
-        <span data-i18n="labelScope">Scope</span>
-        <span class="help-badge"
-          data-i18n-tip="tipScope">?</span>
-      </div>
-      <div class="scope-row">
-        <select id="scope-select" class="select" data-i18n-aria="labelScope" aria-label="Export scope">
-          <option value="all" data-i18n="scopeAll">All Tabs</option>
-          <option value="current" data-i18n="scopeCurrent">This Page</option>
-          <option value="ungrouped" data-i18n="scopeUngrouped">Default / Ungrouped</option>
-          <!-- Groups and containers are injected dynamically by popup.js -->
-        </select>
-        <button id="refresh-scope" class="icon-btn" data-i18n-aria="ariaRefresh" aria-label="Refresh groups and containers list"
+      <div class="section-header-row">
+        <div class="section-label">
+          <span data-i18n="labelScope">Scope</span>
+          <span class="help-badge" data-i18n-tip="tipScope">?</span>
+        </div>
+        <button id="refresh-scope" class="icon-btn-compact" data-i18n-aria="ariaRefresh" aria-label="Refresh tabs and scopes"
           data-i18n-tip="tipRefresh">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <polyline points="23 4 23 10 17 10" />
             <polyline points="1 20 1 14 7 14" />
             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
           </svg>
         </button>
       </div>
+
+      <!-- Scope Category Navigation Pills -->
+      <div class="scope-pills" role="radiogroup" aria-label="Scope category">
+        <button type="button" class="scope-pill active" data-category="all" id="pill-all"
+          data-i18n-tip="tipScopeCategoryAll">
+          <span data-i18n="scopeCategoryAll">All</span>
+        </button>
+        <button type="button" class="scope-pill" data-category="current" id="pill-current"
+          data-i18n-tip="tipScopeCategoryCurrent">
+          <span data-i18n="scopeCategoryCurrent">Page</span>
+        </button>
+        <button type="button" class="scope-pill" data-category="domain" id="pill-domain"
+          data-i18n-tip="tipScopeCategoryDomain">
+          <span data-i18n="scopeCategoryDomain">Domain</span>
+        </button>
+        <button type="button" class="scope-pill" data-category="group" id="pill-group"
+          data-i18n-tip="tipScopeCategoryGroups">
+          <span data-i18n="scopeCategoryGroups">Group</span>
+        </button>
+        <button type="button" class="scope-pill" data-category="container" id="pill-container"
+          data-i18n-tip="tipScopeCategoryContainers">
+          <span data-i18n="scopeCategoryContainers">Container</span>
+        </button>
+      </div>
+
+      <!-- Contextual Sub-Selector (smoothly revealed for Domain, Group, Container) -->
+      <div class="context-selector-container" id="context-selector-container" hidden>
+        <select id="context-select" class="select" aria-label="Scope detail target">
+        </select>
+      </div>
+
+      <!-- Hidden canonical input holding active scope value -->
+      <input type="hidden" id="scope-select" value="all">
     </section>
 
     <!-- Options row -->

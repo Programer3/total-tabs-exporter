@@ -26,7 +26,7 @@ export class MarkdownFormatter {
 
     // Native groups
     for (const entry of Object.values(groupedTabs.groups)) {
-      lines.push(`## 📁 Group: ${escapeMarkdown(entry.meta.name)}`, '');
+      lines.push(`## Group: ${escapeMarkdown(entry.meta.name)}`, '');
       lines.push(`*${entry.tabs.length} tab${entry.tabs.length !== 1 ? 's' : ''}*`, '');
       await chunkProcess(entry.tabs, 100, (tab) => {
         lines.push(this._tabLine(tab, includeTitle), '');
@@ -36,7 +36,7 @@ export class MarkdownFormatter {
 
     // Containers
     for (const entry of Object.values(groupedTabs.containers)) {
-      lines.push(`## 🔷 Container: ${escapeMarkdown(entry.meta.name)}`, '');
+      lines.push(`## Container: ${escapeMarkdown(entry.meta.name)}`, '');
       lines.push(`*${entry.tabs.length} tab${entry.tabs.length !== 1 ? 's' : ''}*`, '');
       await chunkProcess(entry.tabs, 100, (tab) => {
         lines.push(this._tabLine(tab, includeTitle), '');
@@ -46,7 +46,7 @@ export class MarkdownFormatter {
 
     // Ungrouped
     if (groupedTabs.ungrouped.length > 0) {
-      lines.push('## 🔗 Default / Ungrouped', '');
+      lines.push('## Default / Ungrouped', '');
       lines.push(`*${groupedTabs.ungrouped.length} tab${groupedTabs.ungrouped.length !== 1 ? 's' : ''}*`, '');
       await chunkProcess(groupedTabs.ungrouped, 100, (tab) => {
         lines.push(this._tabLine(tab, includeTitle), '');

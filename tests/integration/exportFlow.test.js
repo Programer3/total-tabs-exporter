@@ -3,7 +3,7 @@
  * Tests the complete runExport() flow with mocked browser APIs.
  */
 
-import { runExport, fetchScopeOptions } from '../../core/exportCoordinator.js';
+import { runExport, fetchScopeOptions, getTabDomain } from '../../core/exportCoordinator.js';
 
 describe('exportCoordinator — full pipeline', () => {
   beforeEach(() => resetBrowserMocks());
@@ -48,6 +48,51 @@ describe('exportCoordinator — full pipeline', () => {
     const result = await runExport({ format: 'json', scope: 'container:firefox-container-1', output: 'clipboard' });
     expect(result.success).toBe(true);
     expect(result.count).toBe(1);   // Tab index 3 is in container
+  });
+
+  test('runExport with domain:example.com exports all tabs of that domain', async () => {
+    const result = await runExport({ format: 'markdown', scope: 'domain:example.com', output: 'clipboard' });
+    expect(result.success).toBe(true);
+    expect(result.count).toBe(5); // Default mock has 5 tabs all on example.com
+  });
+
+  test('runExport with domain:current exports all tabs matching active tab domain', async () => {
+    const mixedTabs = [
+      { id: 1, title: 'GitHub 1', url: 'https://github.com/repo1', windowId: 1, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: true, index: 0, discarded: false },
+      { id: 2, title: 'GitHub 2', url: 'https://www.github.com/repo2', windowId: 1, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: false, index: 1, discarded: false },
+      { id: 3, title: 'Google', url: 'https://google.com/search', windowId: 1, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: false, index: 2, discarded: false },
+    ];
+    browser.tabs.query.mockResolvedValue(mixedTabs);
+
+    const result = await runExport({ format: 'text', scope: 'domain:current', output: 'clipboard' });
+    expect(result.success).toBe(true);
+    expect(result.count).toBe(2); // Only the 2 github.com tabs
+  });
+
+  test('runExport throws for unknown domain scope', async () => {
+    await expect(
+      runExport({ format: 'text', scope: 'domain:nonexistent.org', output: 'clipboard' })
+    ).rejects.toThrow(/not found/i);
+  });
+
+  test('runExport throws for domain:current when active tab is not a web domain', async () => {
+    const internalTabs = [
+      { id: 1, title: 'Settings', url: 'about:config', windowId: 1, groupId: -1, cookieStoreId: 'firefox-default', pinned: false, active: true, index: 0, discarded: false },
+    ];
+    browser.tabs.query.mockResolvedValue(internalTabs);
+
+    await expect(
+      runExport({ format: 'text', scope: 'domain:current', output: 'clipboard', filterInternal: false })
+    ).rejects.toThrow(/web domain/i);
+  });
+
+  test('getTabDomain extracts and normalizes web domains correctly', () => {
+    expect(getTabDomain('https://www.github.com/path?q=1')).toBe('github.com');
+    expect(getTabDomain('http://Sub.Domain.com:8080/')).toBe('sub.domain.com');
+    expect(getTabDomain('about:config')).toBeNull();
+    expect(getTabDomain('moz-extension://uuid/page.html')).toBeNull();
+    expect(getTabDomain(null)).toBeNull();
+    expect(getTabDomain('invalid-url')).toBeNull();
   });
 
   test('runExport with scope=current exports only the active tab in the current window', async () => {
@@ -95,10 +140,14 @@ describe('exportCoordinator — full pipeline', () => {
     expect(grouped).toHaveProperty('containers');
     expect(grouped).toHaveProperty('ungrouped');
     expect(grouped).toHaveProperty('windows');
+    expect(grouped).toHaveProperty('domains');
+    expect(grouped).toHaveProperty('currentDomain');
     expect(grouped).toHaveProperty('currentWindowId');
     expect(grouped).toHaveProperty('totalWindows');
     expect(Array.isArray(grouped.all)).toBe(true);
     expect(Array.isArray(grouped.windows)).toBe(true);
+    expect(grouped.domains['example.com']).toBeDefined();
+    expect(grouped.domains['example.com'].count).toBe(5);
   });
 
   test('runExport with windowScope=current exports only tabs in current window', async () => {

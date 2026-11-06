@@ -4,12 +4,12 @@
  * Set localStorage.setItem('TAB_EXPORTER_DEBUG', '1') to enable.
  */
 
+/* eslint-disable no-console */
 const PREFIX = '[TabExporter]';
 const isDebug = () =>
   typeof localStorage !== 'undefined' &&
   typeof localStorage.getItem === 'function' &&
   localStorage.getItem('TAB_EXPORTER_DEBUG') === '1';
-
 
 export const logger = {
   debug: (...args) => { if (isDebug()) { console.debug(PREFIX, ...args); } },

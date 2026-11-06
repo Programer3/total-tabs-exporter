@@ -29,10 +29,13 @@ export async function downloadFile(content, filename, mimeType) {
     });
   } finally {
     // Revoke after delay to ensure the download manager has read the blob
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       URL.revokeObjectURL(url);
       logger.debug('downloadFile: blob URL revoked');
     }, 15_000);
+    if (timer && typeof timer.unref === 'function') {
+      timer.unref();
+    }
   }
 }
 

@@ -1,0 +1,209 @@
+/* theme.css — Material 3 Orange & OKLCH Design Tokens and Base Overlays */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* Material 3 Orange Baseline Tokens (.rules/design/DESIGN.md) */
+  --primary: oklch(0.68 0.20 48.0);
+  --on-primary: oklch(0.98 0.01 48.0);
+  --primary-container: oklch(0.92 0.08 48.0);
+  --on-primary-container: oklch(0.25 0.06 48.0);
+  --surface: oklch(0.20 0.01 48.0);
+  --surface-container: oklch(0.26 0.01 48.0);
+  --surface-container-high: oklch(0.32 0.02 48.0);
+  --on-surface: oklch(0.92 0.02 48.0);
+  --outline: oklch(0.40 0.02 48.0);
+  --outline-variant: oklch(0.30 0.02 48.0);
+  --error: oklch(0.55 0.22 27.0);
+
+  /* Semantic Component Aliases */
+  --bg: oklch(0.15 0.01 48.0);
+  --surface2: var(--surface-container);
+  --border: var(--outline-variant);
+  --text: var(--on-surface);
+  --text-muted: oklch(0.70 0.02 48.0);
+  --accent: var(--primary);
+  --accent-dim: oklch(0.68 0.20 48.0 / 16%);
+  --accent-hover: oklch(0.74 0.20 48.0);
+  --blue: oklch(0.72 0.12 180);
+  --blue-dim: oklch(0.72 0.12 180 / 12%);
+  --success: oklch(0.76 0.15 140);
+
+  /* Offline-first Typography — No External Network Dependencies */
+  --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Roboto Mono', 'Cascadia Code', monospace;
+  --popup-w: 390px;
+
+  /* Concentric border-radius tokens: outer = inner + padding */
+  --radius-outer: 16px;
+  --radius-inner: 8px;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  width: var(--popup-w);
+  min-height: 100px;
+  overflow-x: hidden;
+  font-size: 0.875rem;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Toast Overlay ── */
+.toast {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-inner);
+  padding: 0.45rem 0.9rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.2s ease;
+  z-index: 100;
+}
+
+.toast.success {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.toast.error {
+  border-color: var(--error);
+  color: var(--error);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* ── Tooltips (Dynamic JS-managed) ── */
+.dynamic-tooltip {
+  position: fixed;
+  background: var(--surface2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-inner);
+  padding: 0.45rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: normal;
+  width: max-content;
+  max-width: 240px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.65);
+  text-align: left;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.dynamic-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dynamic-tooltip.bottom {
+  transform: translateY(-6px);
+}
+
+.dynamic-tooltip.bottom.visible {
+  transform: translateY(0);
+}
+
+.dynamic-tooltip::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: var(--border) transparent transparent transparent;
+  bottom: -11px;
+}
+
+.dynamic-tooltip.bottom::before {
+  bottom: auto;
+  top: -11px;
+  border-color: transparent transparent var(--border) transparent;
+}
+
+/* ── Help Badge ── */
+.help-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: default;
+  margin-left: 0.3rem;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.help-badge:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* ── Status Bar & Spinner Overlay ── */
+.status-bar {
+  padding: 0.5rem 1rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.status-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+

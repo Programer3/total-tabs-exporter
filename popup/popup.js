@@ -11,28 +11,30 @@ const STORAGE_KEY = 'tabExporterSettings';
 
 /* ── DOM refs ── */
 const $ = (id) => document.getElementById(id);
-const elTabCount      = $('tab-count');
-const elSummaryLabel  = $('summary-label');
-const elWindowSection = $('window-section');
-const elWindowSelect  = $('window-select');
-const elScopeSelect   = $('scope-select');
-const elRefreshBtn    = $('refresh-scope');
-const elSettingsBtn   = $('settings-btn');
-const elOptTitle      = $('opt-title');
-const elOptFilter     = $('opt-filter');
-const elBtnDownload   = $('btn-download');
-const elBtnCopy       = $('btn-copy');
-const elStatusBar     = $('status-bar');
-const elStatusText    = $('status-text');
-const elToast         = $('toast');
+const elTabCount         = $('tab-count');
+const elSummaryLabel     = $('summary-label');
+const elWindowSection    = $('window-section');
+const elWindowSelect     = $('window-select');
+const elScopeSelect      = $('scope-select');
+const elContextContainer = $('context-selector-container');
+const elContextSelect    = $('context-select');
+const elRefreshBtn       = $('refresh-scope');
+const elSettingsBtn      = $('settings-btn');
+const elOptTitle         = $('opt-title');
+const elOptFilter        = $('opt-filter');
+const elBtnDownload      = $('btn-download');
+const elBtnCopy          = $('btn-copy');
+const elStatusBar        = $('status-bar');
+const elStatusText       = $('status-text');
+const elToast            = $('toast');
 
 let toastTimer = null;
 let cachedGroupedTabs = null;
 let savedDefaultWindow = 'current';
+let activeCategory = 'all';
 
 /* ── Localization ── */
 function localizeUI() {
-  // Text content
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     const key = el.getAttribute('data-i18n');
     const msg = browser.i18n.getMessage(key);
@@ -41,7 +43,6 @@ function localizeUI() {
     }
   });
 
-  // Aria labels
   document.querySelectorAll('[data-i18n-aria]').forEach((el) => {
     const key = el.getAttribute('data-i18n-aria');
     const msg = browser.i18n.getMessage(key);
@@ -131,6 +132,14 @@ async function updateTabCount() {
   } else if (scope.startsWith('container:')) {
     const id = scope.slice(10);
     count = cachedGroupedTabs.containers[id]?.tabs.length ?? 0;
+  } else if (scope.startsWith('domain:')) {
+    const target = scope.slice(7).toLowerCase();
+    if (target === 'current') {
+      const dom = cachedGroupedTabs.currentDomain;
+      count = dom && cachedGroupedTabs.domains ? (cachedGroupedTabs.domains[dom]?.count ?? 0) : 0;
+    } else {
+      count = cachedGroupedTabs.domains?.[target]?.count ?? 0;
+    }
   }
 
   elTabCount.textContent = count;
@@ -151,6 +160,118 @@ async function updateTabCount() {
   }
 }
 
+/* ── Contextual Selector Renderer ── */
+function renderContextSelector() {
+  if (!cachedGroupedTabs) { return; }
+
+  if (activeCategory === 'all') {
+    elContextContainer.hidden = true;
+    elScopeSelect.value = 'all';
+    return;
+  }
+
+  if (activeCategory === 'current') {
+    elContextContainer.hidden = true;
+    elScopeSelect.value = 'current';
+    return;
+  }
+
+  elContextContainer.hidden = false;
+  elContextSelect.innerHTML = '';
+
+  if (activeCategory === 'domain') {
+    const domains = Object.values(cachedGroupedTabs.domains || {})
+      .sort((a, b) => b.count - a.count);
+
+    if (domains.length === 0) {
+      const opt = document.createElement('option');
+      opt.value = 'all';
+      opt.disabled = true;
+      opt.textContent = browser.i18n.getMessage('labelNoDomains') || 'No web domains found';
+      elContextSelect.appendChild(opt);
+      elScopeSelect.value = 'all';
+      return;
+    }
+
+    const currentDom = cachedGroupedTabs.currentDomain;
+    if (currentDom && cachedGroupedTabs.domains?.[currentDom]) {
+      const optCurrent = document.createElement('option');
+      optCurrent.value = `domain:${currentDom}`;
+      const count = cachedGroupedTabs.domains[currentDom].count;
+      optCurrent.textContent = `${browser.i18n.getMessage('labelCurrentDomain') || 'Current Domain'}: ${currentDom} (${count})`;
+      elContextSelect.appendChild(optCurrent);
+    }
+
+    for (const d of domains) {
+      if (d.domain === currentDom) { continue; }
+      const opt = document.createElement('option');
+      opt.value = `domain:${d.domain}`;
+      opt.textContent = `${d.domain} (${d.count})`;
+      elContextSelect.appendChild(opt);
+    }
+
+    elScopeSelect.value = elContextSelect.value;
+    return;
+  }
+
+  if (activeCategory === 'group') {
+    const groups = Object.entries(cachedGroupedTabs.groups || {});
+    if (groups.length === 0) {
+      const opt = document.createElement('option');
+      opt.value = 'all';
+      opt.disabled = true;
+      opt.textContent = browser.i18n.getMessage('labelNoGroups') || 'No tab groups in this window';
+      elContextSelect.appendChild(opt);
+      elScopeSelect.value = 'all';
+      return;
+    }
+
+    for (const [id, { meta, tabs }] of groups) {
+      const opt = document.createElement('option');
+      opt.value = `group:${id}`;
+      opt.textContent = `${meta.name} (${tabs.length})`;
+      elContextSelect.appendChild(opt);
+    }
+
+    elScopeSelect.value = elContextSelect.value;
+    return;
+  }
+
+  if (activeCategory === 'container') {
+    const containers = Object.entries(cachedGroupedTabs.containers || {});
+    for (const [id, { meta, tabs }] of containers) {
+      const opt = document.createElement('option');
+      opt.value = `container:${id}`;
+      opt.textContent = `${meta.name} (${tabs.length})`;
+      elContextSelect.appendChild(opt);
+    }
+
+    if (cachedGroupedTabs.ungrouped?.length > 0) {
+      const opt = document.createElement('option');
+      opt.value = 'ungrouped';
+      opt.textContent = `${browser.i18n.getMessage('scopeUngrouped') || 'Default / Ungrouped'} (${cachedGroupedTabs.ungrouped.length})`;
+      elContextSelect.appendChild(opt);
+    }
+
+    elScopeSelect.value = elContextSelect.value;
+  }
+}
+
+/* ── Switch Scope Category ── */
+function setScopeCategory(category) {
+  activeCategory = category;
+  document.querySelectorAll('.scope-pill').forEach((p) => {
+    if (p.dataset.category === category) {
+      p.classList.add('active');
+    } else {
+      p.classList.remove('active');
+    }
+  });
+
+  renderContextSelector();
+  updateTabCount();
+}
+
 /* ── Scope population ── */
 async function populateScope() {
   elRefreshBtn.disabled = true;
@@ -169,7 +290,6 @@ async function populateScope() {
       const prevWinVal = elWindowSelect.value;
       elWindowSelect.innerHTML = '';
 
-      // 1. This Window option
       const currentWin = grouped.windows.find((w) => w.isCurrent);
       const optCurrentWin = document.createElement('option');
       optCurrentWin.value = 'current';
@@ -178,7 +298,6 @@ async function populateScope() {
       optCurrentWin.textContent = `${browser.i18n.getMessage('windowCurrent') || 'This Window'} (${currentCount} ${currentTabWord})`;
       elWindowSelect.appendChild(optCurrentWin);
 
-      // 2. All Windows option
       const optAllWin = document.createElement('option');
       optAllWin.value = 'all';
       const allCount = grouped.allTabsCount ?? 0;
@@ -186,7 +305,6 @@ async function populateScope() {
       optAllWin.textContent = `${browser.i18n.getMessage('windowAll') || 'All Windows'} (${allCount} ${allTabWord})`;
       elWindowSelect.appendChild(optAllWin);
 
-      // 3. Other specific windows: Window N (X tabs)
       grouped.windows.filter((w) => !w.isCurrent).forEach((w) => {
         const optOtherWin = document.createElement('option');
         optOtherWin.value = `window:${w.id}`;
@@ -195,7 +313,6 @@ async function populateScope() {
         elWindowSelect.appendChild(optOtherWin);
       });
 
-      // Restore previous window selection if valid, else fall back to saved default or 'current'
       const validWinVals = [...elWindowSelect.options].map((o) => o.value);
       elWindowSelect.value = validWinVals.includes(prevWinVal)
         ? prevWinVal
@@ -204,73 +321,7 @@ async function populateScope() {
       elWindowSection.hidden = true;
     }
 
-    // Scope selection population
-    const previousScope = elScopeSelect.value;
-    const staticValues = new Set(['all', 'current', 'ungrouped']);
-    [...elScopeSelect.options].forEach((opt) => {
-      if (!staticValues.has(opt.value)) { opt.remove(); }
-    });
-
-    // Calculate current tab availability
-    const [currentTab] = await browser.tabs.query({ active: true, currentWindow: true });
-    let isCurrentIncluded = true;
-    if (filterInternal && currentTab) {
-      const url = currentTab.url.toLowerCase();
-      if (url.startsWith('about:') ||
-          url.startsWith('moz-extension:') ||
-          url.startsWith('chrome-extension:') ||
-          url.startsWith('chrome:')) {
-        isCurrentIncluded = false;
-      }
-    }
-    const currentCount = isCurrentIncluded && currentTab ? 1 : 0;
-
-    // Update All Tabs option text
-    const optAll = elScopeSelect.querySelector('option[value="all"]');
-    if (optAll) {
-      const isAllWin = elWindowSelect && !elWindowSection.hidden && elWindowSelect.value === 'all';
-      const allLabel = isAllWin
-        ? `${browser.i18n.getMessage('scopeAll') || 'All Tabs'} (All Windows)`
-        : (grouped.totalWindows > 1
-            ? `${browser.i18n.getMessage('scopeAll') || 'All Tabs'} (This Window)`
-            : (browser.i18n.getMessage('scopeAll') || 'All Tabs'));
-      optAll.textContent = `${allLabel} (${grouped.all.length})`;
-    }
-
-    // Update This Page option text with count
-    const optCurrent = elScopeSelect.querySelector('option[value="current"]');
-    if (optCurrent) {
-      const baseText = browser.i18n.getMessage('scopeCurrent') || 'This Page';
-      optCurrent.textContent = `${baseText} (${currentCount})`;
-    }
-
-    // Update Ungrouped option text with count
-    const optUngrouped = elScopeSelect.querySelector('option[value="ungrouped"]');
-    if (optUngrouped) {
-      const baseText = browser.i18n.getMessage('scopeUngrouped') || 'Default / Ungrouped';
-      optUngrouped.textContent = `${baseText} (${grouped.ungrouped.length})`;
-    }
-
-    // Native groups
-    for (const [id, { meta, tabs }] of Object.entries(grouped.groups)) {
-      const opt       = document.createElement('option');
-      opt.value       = `group:${id}`;
-      opt.textContent = `Group: ${meta.name} (${tabs.length})`;
-      elScopeSelect.appendChild(opt);
-    }
-
-    // Containers
-    for (const [id, { meta, tabs }] of Object.entries(grouped.containers)) {
-      const opt       = document.createElement('option');
-      opt.value       = `container:${id}`;
-      opt.textContent = `Container: ${meta.name} (${tabs.length})`;
-      elScopeSelect.appendChild(opt);
-    }
-
-    // Restore previous selection if it still exists, otherwise fall back to 'all'
-    const optionValues = [...elScopeSelect.options].map((o) => o.value);
-    elScopeSelect.value = optionValues.includes(previousScope) ? previousScope : 'all';
-
+    renderContextSelector();
     await updateTabCount();
 
   } catch (err) {
@@ -335,10 +386,22 @@ async function init() {
   elRefreshBtn.addEventListener('click',  populateScope);
   elSettingsBtn.addEventListener('click', () => browser.runtime.openOptionsPage());
 
+  document.querySelectorAll('.scope-pill').forEach((pill) => {
+    pill.addEventListener('click', () => {
+      setScopeCategory(pill.dataset.category);
+    });
+  });
+
+  if (elContextSelect) {
+    elContextSelect.addEventListener('change', () => {
+      elScopeSelect.value = elContextSelect.value;
+      updateTabCount();
+    });
+  }
+
   if (elWindowSelect) {
     elWindowSelect.addEventListener('change', populateScope);
   }
-  elScopeSelect.addEventListener('change', updateTabCount);
   elOptFilter.addEventListener('change', populateScope);
 }
 

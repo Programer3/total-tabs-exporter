@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "__MSG_extensionName__",
   "short_name": "totaltabsexporter",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "__MSG_extensionDescription__",
   "default_locale": "en_US",
   "permissions": [
@@ -37,7 +37,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "tab-exporter@local.extension",
-      "strict_min_version": "140.0",
+      "strict_min_version": "139.0",
       "data_collection_permissions": {
         "required": [
           "none"

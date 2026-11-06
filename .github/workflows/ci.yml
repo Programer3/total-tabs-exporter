@@ -1,0 +1,83 @@
+name: CI & Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'screenshot*.png'
+      - 'LICENSE'
+      - '.cursorrules'
+      - '.rules/**'
+      - 'AGENTS.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  verify-and-release:
+    name: Lint, Test, Package & Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      WEB_EXT_DISABLE_UPDATE_CHECK: '1'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run Jest test suite & coverage gate
+        run: npm test
+
+      - name: Validate Version Parity (manifest vs package.json)
+        id: version
+        run: |
+          MANIFEST_VER=$(node -p "require('./manifest.json').version")
+          PKG_VER=$(node -p "require('./package.json').version")
+          if [ "$MANIFEST_VER" != "$PKG_VER" ]; then
+            echo "::error::Version mismatch: manifest.json ($MANIFEST_VER) != package.json ($PKG_VER)"
+            exit 1
+          fi
+          echo "TAG_NAME=v$MANIFEST_VER" >> "$GITHUB_OUTPUT"
+          echo "VERSION=$MANIFEST_VER" >> "$GITHUB_OUTPUT"
+
+      - name: Build web extension package
+        run: npm run package
+
+      - name: Lint web extension package
+        run: npx web-ext lint --source-dir .
+
+      - name: Publish GitHub Release (Idempotent)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ steps.version.outputs.TAG_NAME }}
+        run: |
+          if gh release view "$TAG_NAME" > /dev/null 2>&1; then
+            echo "Release $TAG_NAME already exists on GitHub. Skipping release creation."
+          else
+            echo "Creating new GitHub Release $TAG_NAME..."
+            gh release create "$TAG_NAME" dist/*.zip \
+              --title "Release $TAG_NAME" \
+              --generate-notes
+            echo "Successfully created release $TAG_NAME with extension assets."
+          fi

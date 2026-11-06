@@ -44,6 +44,57 @@
   "scopeUngrouped": {
     "message": "Default / Ungrouped"
   },
+  "scopeCategoryAll": {
+    "message": "All"
+  },
+  "scopeCategoryCurrent": {
+    "message": "Page"
+  },
+  "scopeCategoryDomain": {
+    "message": "Domain"
+  },
+  "scopeCategoryGroups": {
+    "message": "Group"
+  },
+  "scopeCategoryContainers": {
+    "message": "Container"
+  },
+  "labelCurrentDomain": {
+    "message": "Current Domain"
+  },
+  "labelNoDomains": {
+    "message": "No web domains found"
+  },
+  "labelNoGroups": {
+    "message": "No tab groups in this window"
+  },
+  "labelNoContainers": {
+    "message": "No containers in this window"
+  },
+  "errDomainNotFound": {
+    "message": "Domain \"$DOMAIN$\" not found.",
+    "placeholders": {
+      "DOMAIN": { "content": "$1" }
+    }
+  },
+  "errNoCurrentDomain": {
+    "message": "Active tab does not have a valid web domain."
+  },
+  "tipScopeCategoryAll": {
+    "message": "Export all tabs"
+  },
+  "tipScopeCategoryCurrent": {
+    "message": "Export only the active page tab"
+  },
+  "tipScopeCategoryDomain": {
+    "message": "Export all tabs belonging to a specific website domain"
+  },
+  "tipScopeCategoryGroups": {
+    "message": "Export tabs by native tab group"
+  },
+  "tipScopeCategoryContainers": {
+    "message": "Export tabs by Multi-Account Container"
+  },
   "optIncludeTitle": {
     "message": "Include tab title"
   },

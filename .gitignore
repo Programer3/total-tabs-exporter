@@ -1,7 +1,6 @@
 # Dependencies
 node_modules/
 npm-debug.log
-package-lock.json
 yarn.lock
 
 # Environment variables
@@ -48,4 +47,8 @@ logs/
 #perosnal files
 dev.md
 .rules/
+.cursorrules
+AGENTS.md
+memory-bank.md
+
 

@@ -53,6 +53,30 @@ function generateFilename(format) {
 }
 
 /**
+ * Extracts and normalizes the domain (hostname) from a tab URL.
+ * Strips leading 'www.' and converts to lowercase.
+ * Returns null for invalid or non-web/internal protocols.
+ *
+ * @param {string} url
+ * @returns {string|null}
+ */
+export function getTabDomain(url) {
+  if (!url || typeof url !== 'string') {
+    return null;
+  }
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+      return null;
+    }
+    const hostname = parsed.hostname.toLowerCase();
+    return hostname.startsWith('www.') ? hostname.slice(4) : hostname;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Helper to filter grouped tabs down to a subset of TabRecords.
  * @param {import('./groupResolver.js').GroupedTabs} groupedTabs
  * @param {import('./tabCollector.js').TabRecord[]} subsetTabs
@@ -131,6 +155,25 @@ function applyScope(groupedTabs, scope, activeTabInCurrentWindow = null, current
     return { all: entry.tabs, groups: {}, containers: { [id]: entry }, ungrouped: [] };
   }
 
+  if (scope === 'domain:current') {
+    const currentUrl = activeTabInCurrentWindow?.url;
+    const domain = getTabDomain(currentUrl);
+    if (!domain) {
+      throw new Error(browser.i18n.getMessage('errNoCurrentDomain') || 'Active tab does not have a valid web domain.');
+    }
+    const tabs = groupedTabs.all.filter((t) => getTabDomain(t.url) === domain);
+    return filterGroupedTabs(groupedTabs, tabs);
+  }
+
+  if (scope.startsWith('domain:')) {
+    const targetDomain = scope.slice(7).toLowerCase();
+    const tabs = groupedTabs.all.filter((t) => getTabDomain(t.url) === targetDomain);
+    if (tabs.length === 0) {
+      throw new Error(browser.i18n.getMessage('errDomainNotFound', [targetDomain]) || `Domain "${targetDomain}" not found.`);
+    }
+    return filterGroupedTabs(groupedTabs, tabs);
+  }
+
   throw new Error(browser.i18n.getMessage('errUnknownScope', [scope]) || `Unknown export scope: "${scope}"`);
 }
 
@@ -156,7 +199,7 @@ export async function runExport(options) {
 
   const currentWinId = await getCurrentWindowId();
   let activeTab = null;
-  if (scope === 'current') {
+  if (scope === 'current' || scope === 'domain:current' || scope.startsWith('domain:')) {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
     activeTab = tab;
   }
@@ -223,9 +266,33 @@ export async function fetchScopeOptions({ filterInternal = false, windowScope = 
     }
   }
 
+  const domainMap = {};
+  for (const tab of scopedTabs) {
+    const domain = getTabDomain(tab.url);
+    if (domain) {
+      if (!domainMap[domain]) {
+        domainMap[domain] = { domain, count: 0, tabs: [] };
+      }
+      domainMap[domain].count++;
+      domainMap[domain].tabs.push(tab);
+    }
+  }
+
+  let currentDomain = null;
+  try {
+    const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
+    if (activeTab?.url) {
+      currentDomain = getTabDomain(activeTab.url);
+    }
+  } catch {
+    // Ignore in mock/test environments
+  }
+
   const grouped = await resolveTabs(scopedTabs);
   return {
     ...grouped,
+    domains: domainMap,
+    currentDomain,
     windows,
     currentWindowId,
     totalWindows: windows.length,
