@@ -195,13 +195,14 @@ function renderContextSelector() {
       return;
     }
 
+    const frag = document.createDocumentFragment();
     const currentDom = cachedGroupedTabs.currentDomain;
     if (currentDom && cachedGroupedTabs.domains?.[currentDom]) {
       const optCurrent = document.createElement('option');
       optCurrent.value = `domain:${currentDom}`;
       const count = cachedGroupedTabs.domains[currentDom].count;
       optCurrent.textContent = `${browser.i18n.getMessage('labelCurrentDomain') || 'Current Domain'}: ${currentDom} (${count})`;
-      elContextSelect.appendChild(optCurrent);
+      frag.appendChild(optCurrent);
     }
 
     for (const d of domains) {
@@ -209,9 +210,10 @@ function renderContextSelector() {
       const opt = document.createElement('option');
       opt.value = `domain:${d.domain}`;
       opt.textContent = `${d.domain} (${d.count})`;
-      elContextSelect.appendChild(opt);
+      frag.appendChild(opt);
     }
 
+    elContextSelect.appendChild(frag);
     elScopeSelect.value = elContextSelect.value;
     return;
   }
@@ -228,33 +230,37 @@ function renderContextSelector() {
       return;
     }
 
+    const frag = document.createDocumentFragment();
     for (const [id, { meta, tabs }] of groups) {
       const opt = document.createElement('option');
       opt.value = `group:${id}`;
       opt.textContent = `${meta.name} (${tabs.length})`;
-      elContextSelect.appendChild(opt);
+      frag.appendChild(opt);
     }
 
+    elContextSelect.appendChild(frag);
     elScopeSelect.value = elContextSelect.value;
     return;
   }
 
   if (activeCategory === 'container') {
+    const frag = document.createDocumentFragment();
     const containers = Object.entries(cachedGroupedTabs.containers || {});
     for (const [id, { meta, tabs }] of containers) {
       const opt = document.createElement('option');
       opt.value = `container:${id}`;
       opt.textContent = `${meta.name} (${tabs.length})`;
-      elContextSelect.appendChild(opt);
+      frag.appendChild(opt);
     }
 
     if (cachedGroupedTabs.ungrouped?.length > 0) {
       const opt = document.createElement('option');
       opt.value = 'ungrouped';
       opt.textContent = `${browser.i18n.getMessage('scopeUngrouped') || 'Default / Ungrouped'} (${cachedGroupedTabs.ungrouped.length})`;
-      elContextSelect.appendChild(opt);
+      frag.appendChild(opt);
     }
 
+    elContextSelect.appendChild(frag);
     elScopeSelect.value = elContextSelect.value;
   }
 }
