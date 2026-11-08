@@ -8,6 +8,10 @@
   padding: 0;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 :root {
   /* Material 3 Orange Baseline Tokens (.rules/design/DESIGN.md) */
   --primary: oklch(0.68 0.20 48.0);

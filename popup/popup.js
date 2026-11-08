@@ -166,12 +166,14 @@ function renderContextSelector() {
 
   if (activeCategory === 'all') {
     elContextContainer.hidden = true;
+    elContextSelect.innerHTML = '';
     elScopeSelect.value = 'all';
     return;
   }
 
   if (activeCategory === 'current') {
     elContextContainer.hidden = true;
+    elContextSelect.innerHTML = '';
     elScopeSelect.value = 'current';
     return;
   }
